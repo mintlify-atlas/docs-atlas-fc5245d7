@@ -1,0 +1,178 @@
+{
+  "projectType": "api-service",
+  "projectName": "Pump.fun API",
+  "projectDescription": "Complete API documentation for Pump.fun - the Solana token launch platform with 483+ endpoints across multiple API versions",
+  "theme": "sequoia",
+  "primaryColor": "#9945FF",
+  "lightColor": "#14F195",
+  "darkColor": "#9945FF",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "api-versions"
+            ]
+          },
+          {
+            "group": "Essentials",
+            "pages": [
+              "essentials/authentication",
+              "essentials/headers",
+              "essentials/error-handling",
+              "essentials/rate-limiting",
+              "essentials/caching"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Coins",
+            "pages": [
+              "api-reference/coins/overview",
+              "api-reference/coins/get-coin",
+              "api-reference/coins/list-coins",
+              "api-reference/coins/create-coin",
+              "api-reference/coins/search",
+              "api-reference/coins/metadata"
+            ]
+          },
+          {
+            "group": "Trades",
+            "pages": [
+              "api-reference/trades/overview",
+              "api-reference/trades/get-trades",
+              "api-reference/trades/latest",
+              "api-reference/trades/by-signature"
+            ]
+          },
+          {
+            "group": "Users & Authentication",
+            "pages": [
+              "api-reference/users/overview",
+              "api-reference/users/get-profile",
+              "api-reference/users/register",
+              "api-reference/users/login",
+              "api-reference/users/permissions"
+            ]
+          },
+          {
+            "group": "Social Features",
+            "pages": [
+              "api-reference/social/bookmarks",
+              "api-reference/social/likes",
+              "api-reference/social/following",
+              "api-reference/social/replies",
+              "api-reference/social/timeline"
+            ]
+          },
+          {
+            "group": "Livestreams",
+            "pages": [
+              "api-reference/livestreams/overview",
+              "api-reference/livestreams/create",
+              "api-reference/livestreams/manage",
+              "api-reference/livestreams/tokens"
+            ]
+          },
+          {
+            "group": "Moderation",
+            "pages": [
+              "api-reference/moderation/overview",
+              "api-reference/moderation/ban-management",
+              "api-reference/moderation/reports",
+              "api-reference/moderation/content-filtering"
+            ]
+          },
+          {
+            "group": "Advanced Analytics",
+            "pages": [
+              "api-reference/analytics/overview",
+              "api-reference/analytics/coins-list",
+              "api-reference/analytics/graduated-coins",
+              "api-reference/analytics/top-holders"
+            ]
+          },
+          {
+            "group": "Utilities",
+            "pages": [
+              "api-reference/utilities/balances",
+              "api-reference/utilities/candlesticks",
+              "api-reference/utilities/notifications",
+              "api-reference/utilities/search"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Common Use Cases",
+            "pages": [
+              "guides/fetching-coins",
+              "guides/tracking-trades",
+              "guides/user-interactions",
+              "guides/working-with-websockets"
+            ]
+          },
+          {
+            "group": "Advanced Topics",
+            "pages": [
+              "guides/handling-webhooks",
+              "guides/bulk-operations",
+              "guides/pagination",
+              "guides/best-practices"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "483+ documented REST API endpoints",
+    "Multiple API versions (Frontend v1/v2/v3, Advanced Analytics v2)",
+    "Comprehensive token/coin operations",
+    "Real-time trade tracking and analytics",
+    "Social features (likes, bookmarks, following, replies)",
+    "Livestream integration with LiveKit",
+    "Content moderation and reporting",
+    "JWT authentication",
+    "Rate limiting and caching support",
+    "OpenAPI 3.0 specifications"
+  ],
+  "publicApiSurface": [
+    "GET /coins/{mint} - Retrieve coin information",
+    "GET /coins/latest - Get latest coins",
+    "GET /coins/featured - Get featured coins",
+    "POST /coins/create - Create new coin",
+    "GET /trades/all/{mint} - Get all trades for a coin",
+    "GET /trades/latest - Get latest trades",
+    "POST /auth/login - Authenticate user",
+    "GET /auth/my-profile - Get current user profile",
+    "GET /users/{id} - Get user information",
+    "POST /users/register - Register new user",
+    "POST /bookmarks - Create bookmark",
+    "GET /bookmarks - List bookmarks",
+    "POST /likes/{targetId} - Like content",
+    "DELETE /likes/{targetId} - Unlike content",
+    "POST /following/{userId} - Follow user",
+    "DELETE /following/{userId} - Unfollow user",
+    "GET /livestreams/{mint} - Get livestream info",
+    "POST /livestreams/create/livestream - Create livestream",
+    "GET /notifications - Get user notifications",
+    "GET /search - Search across platform",
+    "GET /balances/{address} - Get wallet balances",
+    "GET /candlesticks/{mint} - Get price candlestick data",
+    "POST /reports - Submit content report",
+    "GET /moderation/ban/users - List banned users"
+  ]
+}
