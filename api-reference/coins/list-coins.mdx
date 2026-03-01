@@ -1,0 +1,205 @@
+---
+title: 'List Coins'
+api: 'GET https://advanced-api-v2.pump.fun/coins/list'
+description: 'Retrieve a list of coins with various filtering and sorting options'
+---
+
+## Endpoint
+
+```
+GET https://advanced-api-v2.pump.fun/coins/list
+```
+
+## Authentication
+
+<Note>
+This endpoint requires JWT authentication. Include your token in the Authorization header.
+</Note>
+
+```bash
+Authorization: Bearer <your_token>
+```
+
+## Query Parameters
+
+This endpoint does not accept query parameters. It returns a list of coins based on default criteria.
+
+<Note>
+For more advanced filtering, sorting, and search capabilities, use the [Search Coins](/api-reference/coins/search) endpoint.
+</Note>
+
+## Response
+
+<ResponseField name="data" type="array">
+  Array of coin objects
+  
+  <Expandable title="Coin Object Properties">
+    <ResponseField name="mint" type="string">
+      The Solana mint address of the coin
+    </ResponseField>
+    
+    <ResponseField name="name" type="string">
+      The name of the coin
+    </ResponseField>
+    
+    <ResponseField name="symbol" type="string">
+      The ticker symbol of the coin
+    </ResponseField>
+    
+    <ResponseField name="description" type="string">
+      Description of the coin
+    </ResponseField>
+    
+    <ResponseField name="image_uri" type="string">
+      URL to the coin's image
+    </ResponseField>
+    
+    <ResponseField name="creator" type="string">
+      Wallet address of the coin creator
+    </ResponseField>
+    
+    <ResponseField name="created_timestamp" type="number">
+      Unix timestamp of when the coin was created
+    </ResponseField>
+    
+    <ResponseField name="complete" type="boolean">
+      Whether the coin has completed its bonding curve
+    </ResponseField>
+    
+    <ResponseField name="market_cap" type="number">
+      Current market capitalization in SOL
+    </ResponseField>
+    
+    <ResponseField name="usd_market_cap" type="number">
+      Market cap in USD
+    </ResponseField>
+    
+    <ResponseField name="nsfw" type="boolean">
+      Whether the coin is marked as NSFW
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Code Examples
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://advanced-api-v2.pump.fun/coins/list" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://advanced-api-v2.pump.fun/coins/list"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+const axios = require('axios');
+
+const url = 'https://advanced-api-v2.pump.fun/coins/list';
+const headers = {
+  'Authorization': 'Bearer <your_token>',
+  'Accept': 'application/json'
+};
+
+axios.get(url, { headers })
+  .then(response => console.log(response.data))
+  .catch(error => console.error(error));
+```
+
+</CodeGroup>
+
+## Response Example
+
+```json
+[
+  {
+    "mint": "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr",
+    "name": "Example Coin",
+    "symbol": "EXAMPLE",
+    "description": "An example coin on Pump.fun",
+    "image_uri": "https://cf-ipfs.com/ipfs/...",
+    "creator": "CkqW...",
+    "created_timestamp": 1704067200000,
+    "complete": false,
+    "market_cap": 25.5,
+    "usd_market_cap": 2856.75,
+    "nsfw": false
+  },
+  {
+    "mint": "8kJ9Lm3Nh4Pg5Qr6St7Uv8Wx9Yz0Ab1Cd2Ef3Gh4Ij5Kl",
+    "name": "Another Coin",
+    "symbol": "ANOTHER",
+    "description": "Another example coin",
+    "image_uri": "https://cf-ipfs.com/ipfs/...",
+    "creator": "DpqX...",
+    "created_timestamp": 1704153600000,
+    "complete": true,
+    "market_cap": 150.25,
+    "usd_market_cap": 16828.05,
+    "nsfw": false
+  }
+]
+```
+
+## Additional List Endpoints
+
+Pump.fun provides several specialized list endpoints for different use cases:
+
+### Frontend API v3 Endpoints
+
+<CardGroup cols={2}>
+  <Card title="Featured Coins" icon="star">
+    `GET /coins/featured/{timeWindow}` - Get featured coins for a specific time window
+  </Card>
+  
+  <Card title="Currently Live" icon="signal-stream">
+    `GET /coins/currently-live` - Get coins that are currently live
+  </Card>
+  
+  <Card title="For You" icon="user">
+    `GET /coins/for-you` - Get personalized coin recommendations
+  </Card>
+  
+  <Card title="King of the Hill" icon="crown">
+    `GET /coins/king-of-the-hill` - Get the current King of the Hill coin
+  </Card>
+</CardGroup>
+
+### Advanced API v2 Endpoints
+
+<CardGroup cols={2}>
+  <Card title="Featured (Advanced)" icon="star">
+    `GET /coins/featured` - Get featured coins with advanced filtering
+  </Card>
+  
+  <Card title="Graduated" icon="graduation-cap">
+    `GET /coins/graduated` - Get coins that have graduated to Raydium
+  </Card>
+  
+  <Card title="KOL Scan" icon="radar">
+    `GET /coins/kolscan` - Get coins detected by KOL scanning
+  </Card>
+</CardGroup>
+
+## Notes
+
+- This endpoint is part of the Advanced API v2 and provides basic coin listing functionality
+- For more control over results, use the [Search endpoint](/api-reference/coins/search) which supports pagination, filtering, and sorting
+- Replace `<your_token>` with your actual JWT token
+
+## Related Endpoints
+
+- [Get Coin](/api-reference/coins/get-coin) - Get details for a specific coin
+- [Search Coins](/api-reference/coins/search) - Advanced search with filters
+- [Get Metadata](/api-reference/coins/metadata) - Retrieve coin metadata

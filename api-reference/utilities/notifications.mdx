@@ -1,0 +1,184 @@
+---
+title: 'Get Notifications'
+api: 'GET https://frontend-api-v3.pump.fun/notifications'
+description: 'Retrieve user notifications and activity alerts'
+---
+
+## Overview
+
+The Notifications endpoint returns user-specific notifications about trades, mentions, follows, and other platform activity.
+
+## Authentication
+
+This endpoint requires JWT authentication via the `Authorization` header:
+
+```bash
+Authorization: Bearer <your_token>
+```
+
+## Endpoint
+
+```
+GET https://frontend-api-v3.pump.fun/notifications
+```
+
+## Query Parameters
+
+<ParamField query="limit" type="number" required>
+  Maximum number of notifications to return
+</ParamField>
+
+<ParamField query="offset" type="number" required>
+  Number of notifications to skip for pagination
+</ParamField>
+
+## Response
+
+<ResponseField name="notifications" type="array">
+  Array of notification objects
+  
+  <Expandable title="Notification Object">
+    <ResponseField name="id" type="string">
+      Unique identifier for the notification
+    </ResponseField>
+    
+    <ResponseField name="type" type="string">
+      Type of notification (trade, mention, follow, like, etc.)
+    </ResponseField>
+    
+    <ResponseField name="title" type="string">
+      Notification title
+    </ResponseField>
+    
+    <ResponseField name="message" type="string">
+      Detailed notification message
+    </ResponseField>
+    
+    <ResponseField name="createdAt" type="number">
+      Unix timestamp when the notification was created
+    </ResponseField>
+    
+    <ResponseField name="read" type="boolean">
+      Whether the notification has been read
+    </ResponseField>
+    
+    <ResponseField name="metadata" type="object">
+      Additional context data specific to the notification type
+      
+      <Expandable title="Metadata">
+        <ResponseField name="userId" type="string">
+          Related user ID (for social notifications)
+        </ResponseField>
+        
+        <ResponseField name="coinMint" type="string">
+          Related coin mint address (for trade notifications)
+        </ResponseField>
+        
+        <ResponseField name="amount" type="string">
+          Transaction amount (for trade notifications)
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="total" type="number">
+  Total number of notifications (for pagination)
+</ResponseField>
+
+<ResponseField name="unreadCount" type="number">
+  Number of unread notifications
+</ResponseField>
+
+## Notification Types
+
+- `trade` - Trade execution notification
+- `mention` - User mentioned you
+- `follow` - New follower
+- `like` - Someone liked your content
+- `reply` - Reply to your comment
+- `coin_graduated` - Coin you hold graduated to Raydium
+- `price_alert` - Price threshold reached
+
+## Example Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/notifications?limit=20&offset=0" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/notifications"
+params = {
+    "limit": 20,
+    "offset": 0
+}
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, headers=headers, params=params)
+print(response.json())
+```
+
+```javascript JavaScript
+const params = new URLSearchParams({
+  limit: '20',
+  offset: '0'
+});
+
+fetch(`https://frontend-api-v3.pump.fun/notifications?${params}`, {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer <your_token>',
+    'Accept': 'application/json'
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data));
+```
+
+```typescript TypeScript
+const params = new URLSearchParams({
+  limit: '20',
+  offset: '0'
+});
+
+const response = await fetch(
+  `https://frontend-api-v3.pump.fun/notifications?${params}`,
+  {
+    method: 'GET',
+    headers: {
+      'Authorization': 'Bearer <your_token>',
+      'Accept': 'application/json'
+    }
+  }
+);
+
+const data = await response.json();
+console.log(data);
+```
+
+</CodeGroup>
+
+## Use Cases
+
+- Display user notification feed
+- Build real-time notification systems
+- Track unread notifications
+- Send push notifications for important events
+- Create activity logs and audit trails
+
+## Notes
+
+- Replace `<your_token>` with your actual JWT token
+- Notifications are user-specific based on the JWT token
+- Use pagination to efficiently load notification history
+- Check `unreadCount` to display notification badges
+- Mark notifications as read through separate endpoint (if available)

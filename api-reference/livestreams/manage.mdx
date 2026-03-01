@@ -1,0 +1,282 @@
+---
+title: 'Manage Livestreams'
+description: 'Enable, disable, ban, and unban livestream sessions'
+---
+
+## Overview
+
+Manage the state and access control of your livestream sessions. These endpoints allow you to control stream availability and moderate content by banning or unbanning specific tokens.
+
+## Enable Livestream
+
+Activate a livestream to allow broadcasting and viewing.
+
+### Endpoint
+
+```
+PUT /livestreams/{mint}/enable-livestream
+```
+
+### Path Parameters
+
+<ParamField path="mint" type="string" required>
+  The token mint address for the livestream to enable
+</ParamField>
+
+### Example Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X PUT "https://frontend-api-v3.pump.fun/livestreams/<mint>/enable-livestream" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/livestreams/<mint>/enable-livestream"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.put(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+const response = await fetch(
+  "https://frontend-api-v3.pump.fun/livestreams/<mint>/enable-livestream",
+  {
+    method: "PUT",
+    headers: {
+      "Authorization": "Bearer <your_token>",
+      "Accept": "application/json"
+    }
+  }
+);
+
+const data = await response.json();
+console.log(data);
+```
+
+</CodeGroup>
+
+---
+
+## Disable Livestream
+
+Deactivate a livestream to prevent broadcasting and viewing.
+
+### Endpoint
+
+```
+PUT /livestreams/{mint}/disable-livestream
+```
+
+### Path Parameters
+
+<ParamField path="mint" type="string" required>
+  The token mint address for the livestream to disable
+</ParamField>
+
+### Example Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X PUT "https://frontend-api-v3.pump.fun/livestreams/<mint>/disable-livestream" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/livestreams/<mint>/disable-livestream"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.put(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+const response = await fetch(
+  "https://frontend-api-v3.pump.fun/livestreams/<mint>/disable-livestream",
+  {
+    method: "PUT",
+    headers: {
+      "Authorization": "Bearer <your_token>",
+      "Accept": "application/json"
+    }
+  }
+);
+
+const data = await response.json();
+console.log(data);
+```
+
+</CodeGroup>
+
+---
+
+## Ban Livestream
+
+Permanently ban a livestream, preventing it from being activated.
+
+### Endpoint
+
+```
+PUT /livestreams/{mint}/ban-livestream
+```
+
+### Path Parameters
+
+<ParamField path="mint" type="string" required>
+  The token mint address for the livestream to ban
+</ParamField>
+
+<Note>
+  Banning a livestream is typically used for moderation purposes to prevent policy violations or inappropriate content.
+</Note>
+
+### Example Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X PUT "https://frontend-api-v3.pump.fun/livestreams/<mint>/ban-livestream" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/livestreams/<mint>/ban-livestream"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.put(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+const response = await fetch(
+  "https://frontend-api-v3.pump.fun/livestreams/<mint>/ban-livestream",
+  {
+    method: "PUT",
+    headers: {
+      "Authorization": "Bearer <your_token>",
+      "Accept": "application/json"
+    }
+  }
+);
+
+const data = await response.json();
+console.log(data);
+```
+
+</CodeGroup>
+
+---
+
+## Unban Livestream
+
+Remove a ban from a livestream, allowing it to be enabled again.
+
+### Endpoint
+
+```
+PUT /livestreams/{mint}/unban-livestream
+```
+
+### Path Parameters
+
+<ParamField path="mint" type="string" required>
+  The token mint address for the livestream to unban
+</ParamField>
+
+### Example Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X PUT "https://frontend-api-v3.pump.fun/livestreams/<mint>/unban-livestream" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/livestreams/<mint>/unban-livestream"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.put(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+const response = await fetch(
+  "https://frontend-api-v3.pump.fun/livestreams/<mint>/unban-livestream",
+  {
+    method: "PUT",
+    headers: {
+      "Authorization": "Bearer <your_token>",
+      "Accept": "application/json"
+    }
+  }
+);
+
+const data = await response.json();
+console.log(data);
+```
+
+</CodeGroup>
+
+---
+
+## Authentication
+
+All management endpoints require JWT authentication via the `Authorization: Bearer <token>` header.
+
+## Response Codes
+
+- **200 OK**: Operation completed successfully
+- **401 Unauthorized**: Invalid or missing authentication token
+- **404 Not Found**: Livestream with specified mint address not found
+
+## Common Workflows
+
+### Temporary Stream Pause
+
+1. Use **Disable Livestream** to temporarily stop broadcasting
+2. Use **Enable Livestream** when ready to resume
+
+### Content Moderation
+
+1. Use **Ban Livestream** to immediately stop and prevent future streams
+2. Review the violation
+3. Use **Unban Livestream** if the ban should be lifted
+
+## Related Endpoints
+
+<CardGroup cols={2}>
+  <Card title="Create Livestream" icon="plus" href="/api-reference/livestreams/create">
+    Initialize a new livestream session
+  </Card>
+  <Card title="Access Tokens" icon="key" href="/api-reference/livestreams/tokens">
+    Generate tokens for hosts and participants
+  </Card>
+</CardGroup>

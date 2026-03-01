@@ -1,0 +1,405 @@
+---
+title: 'Permissions & Access Control'
+description: 'Check user roles, permissions, and access levels'
+---
+
+## Overview
+
+The Permissions API provides endpoints to verify user roles and access levels within the Pump.fun platform. These endpoints help enforce role-based access control (RBAC) for administrative and privileged operations.
+
+## Admin Check
+
+<api method="GET" endpoint="https://frontend-api-v3.pump.fun/auth/is-admin" />
+
+Check if the authenticated user has administrator privileges.
+
+### Authentication
+
+Requires JWT authentication via `Authorization: Bearer <token>` header.
+
+### Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for authentication
+  
+  ```
+  Authorization: Bearer <your_jwt_token>
+  ```
+</ParamField>
+
+<ParamField header="Accept" type="string" required>
+  Response content type
+  
+  ```
+  Accept: application/json
+  ```
+</ParamField>
+
+<ParamField header="Origin" type="string" required>
+  Request origin
+  
+  ```
+  Origin: https://pump.fun
+  ```
+</ParamField>
+
+### Response
+
+<ResponseField name="200" type="object">
+  Admin status check result
+</ResponseField>
+
+### Response Schema
+
+<ResponseField name="isAdmin" type="boolean">
+  `true` if the user has admin privileges, `false` otherwise
+</ResponseField>
+
+### Example Usage
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/auth/is-admin" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json" \
+  -H "Origin: https://pump.fun"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/auth/is-admin"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Origin": "https://pump.fun"
+}
+
+response = requests.get(url, headers=headers)
+result = response.json()
+print(f"Is admin: {result.get('isAdmin')}")
+```
+
+```javascript JavaScript
+const url = "https://frontend-api-v3.pump.fun/auth/is-admin";
+
+const response = await fetch(url, {
+  method: "GET",
+  headers: {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Origin": "https://pump.fun"
+  }
+});
+
+const data = await response.json();
+console.log(`Is admin: ${data.isAdmin}`);
+```
+
+```typescript TypeScript
+interface AdminCheckResponse {
+  isAdmin: boolean;
+}
+
+const url = "https://frontend-api-v3.pump.fun/auth/is-admin";
+
+const response = await fetch(url, {
+  method: "GET",
+  headers: {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Origin": "https://pump.fun"
+  }
+});
+
+const result: AdminCheckResponse = await response.json();
+console.log(`Is admin: ${result.isAdmin}`);
+```
+
+</CodeGroup>
+
+---
+
+## Super Admin Check
+
+<api method="GET" endpoint="https://frontend-api-v3.pump.fun/auth/is-super-admin" />
+
+Check if the authenticated user has super administrator privileges. Super admins have elevated permissions beyond regular administrators.
+
+### Authentication
+
+Requires JWT authentication via `Authorization: Bearer <token>` header.
+
+### Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for authentication
+  
+  ```
+  Authorization: Bearer <your_jwt_token>
+  ```
+</ParamField>
+
+<ParamField header="Accept" type="string" required>
+  Response content type
+  
+  ```
+  Accept: application/json
+  ```
+</ParamField>
+
+<ParamField header="Origin" type="string" required>
+  Request origin
+  
+  ```
+  Origin: https://pump.fun
+  ```
+</ParamField>
+
+### Response
+
+<ResponseField name="200" type="object">
+  Super admin status check result
+</ResponseField>
+
+### Response Schema
+
+<ResponseField name="isSuperAdmin" type="boolean">
+  `true` if the user has super admin privileges, `false` otherwise
+</ResponseField>
+
+### Example Usage
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/auth/is-super-admin" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json" \
+  -H "Origin: https://pump.fun"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/auth/is-super-admin"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Origin": "https://pump.fun"
+}
+
+response = requests.get(url, headers=headers)
+result = response.json()
+print(f"Is super admin: {result.get('isSuperAdmin')}")
+```
+
+```javascript JavaScript
+const url = "https://frontend-api-v3.pump.fun/auth/is-super-admin";
+
+const response = await fetch(url, {
+  method: "GET",
+  headers: {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Origin": "https://pump.fun"
+  }
+});
+
+const data = await response.json();
+console.log(`Is super admin: ${data.isSuperAdmin}`);
+```
+
+</CodeGroup>
+
+<Warning>
+  Super admin privileges should be restricted to a minimal number of trusted users. These accounts have full system access.
+</Warning>
+
+---
+
+## Jurisdiction Check
+
+<api method="GET" endpoint="https://frontend-api-v3.pump.fun/auth/is-valid-jurisdiction" />
+
+Verify if the authenticated user's jurisdiction (geographic location) is valid for accessing the Pump.fun platform. This endpoint enforces geographic restrictions and compliance requirements.
+
+### Authentication
+
+Requires JWT authentication via `Authorization: Bearer <token>` header.
+
+### Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for authentication
+  
+  ```
+  Authorization: Bearer <your_jwt_token>
+  ```
+</ParamField>
+
+<ParamField header="Accept" type="string" required>
+  Response content type
+  
+  ```
+  Accept: application/json
+  ```
+</ParamField>
+
+<ParamField header="Origin" type="string" required>
+  Request origin
+  
+  ```
+  Origin: https://pump.fun
+  ```
+</ParamField>
+
+### Response
+
+<ResponseField name="200" type="object">
+  Jurisdiction validity check result
+</ResponseField>
+
+### Response Schema
+
+<ResponseField name="isValidJurisdiction" type="boolean">
+  `true` if the user's jurisdiction is allowed, `false` if blocked or restricted
+</ResponseField>
+
+<ResponseField name="jurisdiction" type="string">
+  The detected jurisdiction/country code
+</ResponseField>
+
+<ResponseField name="reason" type="string">
+  Explanation if jurisdiction is invalid (only present when `isValidJurisdiction` is `false`)
+</ResponseField>
+
+### Example Usage
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/auth/is-valid-jurisdiction" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json" \
+  -H "Origin: https://pump.fun"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/auth/is-valid-jurisdiction"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Origin": "https://pump.fun"
+}
+
+response = requests.get(url, headers=headers)
+result = response.json()
+
+if result.get('isValidJurisdiction'):
+    print(f"Access allowed from {result.get('jurisdiction')}")
+else:
+    print(f"Access denied: {result.get('reason')}")
+```
+
+```javascript JavaScript
+const url = "https://frontend-api-v3.pump.fun/auth/is-valid-jurisdiction";
+
+const response = await fetch(url, {
+  method: "GET",
+  headers: {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Origin": "https://pump.fun"
+  }
+});
+
+const data = await response.json();
+
+if (data.isValidJurisdiction) {
+  console.log(`Access allowed from ${data.jurisdiction}`);
+} else {
+  console.log(`Access denied: ${data.reason}`);
+}
+```
+
+```typescript TypeScript
+interface JurisdictionCheckResponse {
+  isValidJurisdiction: boolean;
+  jurisdiction: string;
+  reason?: string;
+}
+
+const url = "https://frontend-api-v3.pump.fun/auth/is-valid-jurisdiction";
+
+const response = await fetch(url, {
+  method: "GET",
+  headers: {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Origin": "https://pump.fun"
+  }
+});
+
+const result: JurisdictionCheckResponse = await response.json();
+
+if (result.isValidJurisdiction) {
+  console.log(`Access allowed from ${result.jurisdiction}`);
+} else {
+  console.log(`Access denied: ${result.reason}`);
+}
+```
+
+</CodeGroup>
+
+### Use Cases
+
+- Enforce geographic access restrictions
+- Comply with regional regulations
+- Display location-specific content or features
+- Block access from sanctioned countries
+- Implement KYC/compliance workflows
+
+## Permission Hierarchy
+
+The Pump.fun platform uses a hierarchical permission system:
+
+1. **Regular User**: Basic platform access
+2. **Admin**: Elevated privileges for moderation and management
+3. **Super Admin**: Full system access and configuration capabilities
+
+<Warning>
+  Always check permissions before performing privileged operations. Unauthorized access attempts may result in account suspension.
+</Warning>
+
+## Best Practices
+
+### Client-Side Checks
+
+- Use permission checks to show/hide UI elements
+- Check permissions on page load and route changes
+- Cache permission results for better performance
+- Revalidate permissions periodically
+
+### Server-Side Enforcement
+
+- Never rely solely on client-side permission checks
+- Always validate permissions on the backend
+- Log all permission check failures for security monitoring
+- Implement rate limiting on permission endpoints
+
+### Security Considerations
+
+- Permissions may change during a user session
+- Re-check permissions before critical operations
+- Handle permission denials gracefully
+- Provide clear error messages when access is denied
+
+## Related Endpoints
+
+- [GET /auth/my-profile](/api-reference/users/get-profile) - Get current user profile with role information
+- [POST /auth/login](/api-reference/users/login) - Authenticate and obtain JWT token
+- [POST /auth/logout](/api-reference/users/login#logout) - End user session

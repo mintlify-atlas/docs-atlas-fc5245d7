@@ -1,0 +1,72 @@
+---
+title: 'Livestreams Overview'
+description: 'Real-time video streaming powered by LiveKit integration'
+---
+
+## Introduction
+
+The Pump.fun Livestreams API enables real-time video streaming functionality for token launches and community engagement. Built on top of LiveKit infrastructure, it provides comprehensive streaming capabilities including:
+
+- Creating and managing livestreams for token launches
+- Host and participant access control
+- Stream moderation and banning capabilities
+- Real-time token generation for secure stream access
+
+## LiveKit Integration
+
+Pump.fun uses LiveKit as its streaming infrastructure, providing:
+
+- **Low-latency streaming**: Real-time video and audio communication
+- **Scalable infrastructure**: Handle multiple concurrent streams
+- **Secure access**: Token-based authentication for hosts and participants
+- **Interactive features**: Support for chat, stage management, and participant controls
+
+## Authentication
+
+All livestream endpoints require JWT authentication via the `Authorization: Bearer <token>` header. Make sure you have a valid authentication token before making API requests.
+
+## Common Use Cases
+
+### Token Launch Livestream
+
+1. Create a livestream for your token using `/livestreams/create-livestream`
+2. Obtain a host token with `/livestreams/livekit/token/host`
+3. Manage participants and viewers
+4. Enable/disable streaming as needed
+
+### Moderation
+
+- **Enable/Disable**: Control when streams are active
+- **Ban/Unban**: Remove or restore access for specific tokens
+- **Stage Management**: Control who can join the broadcast
+
+## Endpoint Categories
+
+<CardGroup cols={2}>
+  <Card title="Stream Creation" icon="video" href="/api-reference/livestreams/create">
+    Create new livestreams for token launches
+  </Card>
+  <Card title="Stream Management" icon="sliders" href="/api-reference/livestreams/manage">
+    Enable, disable, ban, and unban livestreams
+  </Card>
+  <Card title="Access Tokens" icon="key" href="/api-reference/livestreams/tokens">
+    Generate LiveKit tokens for hosts and participants
+  </Card>
+</CardGroup>
+
+## Base URL
+
+```
+https://frontend-api-v3.pump.fun
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Create a Livestream" icon="plus" href="/api-reference/livestreams/create">
+    Start by creating your first livestream
+  </Card>
+  <Card title="Get Access Tokens" icon="ticket" href="/api-reference/livestreams/tokens">
+    Learn how to generate LiveKit tokens
+  </Card>
+</CardGroup>

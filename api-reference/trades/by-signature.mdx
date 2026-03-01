@@ -1,0 +1,214 @@
+---
+title: 'Get Trades by Signature'
+api: 'POST https://frontend-api-v3.pump.fun/trades/signatures'
+description: 'Retrieve specific trades using their transaction signatures'
+---
+
+## Authentication
+
+This endpoint requires JWT authentication via the `Authorization: Bearer <token>` header.
+
+## Request Body
+
+<ParamField body="signatures" type="array" required>
+  Array of transaction signature strings to retrieve trades for
+  
+  ```json
+  {
+    "signatures": [
+      "5wHu1qwD7...",
+      "3xKp9nM2s...",
+      "7yTn4rP8k..."
+    ]
+  }
+  ```
+</ParamField>
+
+## Response
+
+<ResponseField name="trades" type="array">
+  Array of trade objects matching the provided signatures
+  
+  <Expandable title="trade properties">
+    <ResponseField name="signature" type="string">
+      Transaction signature of the trade
+    </ResponseField>
+    
+    <ResponseField name="mint" type="string">
+      Token mint address
+    </ResponseField>
+    
+    <ResponseField name="timestamp" type="string">
+      When the trade occurred
+    </ResponseField>
+    
+    <ResponseField name="tradeDirection" type="string">
+      Whether this was a buy or sell
+    </ResponseField>
+    
+    <ResponseField name="amount" type="number">
+      Trade amount
+    </ResponseField>
+    
+    <ResponseField name="user" type="string">
+      User wallet address
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/trades/signatures" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "signatures": [
+      "5wHu1qwD7nP2kLmR9vXs8TyC4jFhN6gE3bKpM1aQ2xYuZv",
+      "3xKp9nM2sV8tLqR4yHj6WcF1dN5gP7eKmB9vXs2TyC0zAu"
+    ]
+  }'
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/trades/signatures"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Content-Type": "application/json"
+}
+data = {
+    "signatures": [
+        "5wHu1qwD7nP2kLmR9vXs8TyC4jFhN6gE3bKpM1aQ2xYuZv",
+        "3xKp9nM2sV8tLqR4yHj6WcF1dN5gP7eKmB9vXs2TyC0zAu"
+    ]
+}
+
+response = requests.post(url, headers=headers, json=data)
+print(response.json())
+```
+
+```javascript JavaScript
+const response = await fetch('https://frontend-api-v3.pump.fun/trades/signatures', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer <your_token>',
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    signatures: [
+      '5wHu1qwD7nP2kLmR9vXs8TyC4jFhN6gE3bKpM1aQ2xYuZv',
+      '3xKp9nM2sV8tLqR4yHj6WcF1dN5gP7eKmB9vXs2TyC0zAu'
+    ]
+  })
+});
+
+const data = await response.json();
+console.log(data);
+```
+
+</CodeGroup>
+
+<Note>
+  Replace `<your_token>` with your actual JWT token and use valid Solana transaction signatures.
+</Note>
+
+## Use Cases
+
+### Verify Specific Transactions
+
+Use this endpoint to retrieve detailed information about specific trades when you have their transaction signatures. This is useful for:
+
+- Verifying trade execution
+- Building transaction history views
+- Reconciling on-chain data with platform data
+- Investigating specific trades
+
+### Batch Trade Lookup
+
+Retrieve multiple trades in a single request by providing an array of signatures:
+
+```python
+import requests
+
+# Get multiple trades at once
+signatures_to_check = [
+    "sig1...",
+    "sig2...",
+    "sig3...",
+    "sig4...",
+    "sig5..."
+]
+
+url = "https://frontend-api-v3.pump.fun/trades/signatures"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Content-Type": "application/json"
+}
+
+response = requests.post(url, headers=headers, json={"signatures": signatures_to_check})
+trades = response.json()
+
+for trade in trades:
+    print(f"Trade {trade['signature']}: {trade['amount']} {trade['tradeDirection']}")
+```
+
+## Related Endpoints
+
+For additional trade query options, see:
+
+- [POST /trades/signatures/small](/api-reference/trades/by-signature#get-trades-by-signature-small) - Lightweight version with minimal data
+
+---
+
+## Get Trades by Signature (Small)
+
+<api>POST https://frontend-api-v3.pump.fun/trades/signatures/small</api>
+
+Retrieve trades by signature with a smaller response payload, useful for performance optimization when you don't need all trade details.
+
+### Request Body
+
+<ParamField body="signatures" type="array" required>
+  Array of transaction signature strings
+</ParamField>
+
+### Example Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/trades/signatures/small" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{"signatures": ["5wHu1qwD7..."]}'
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/trades/signatures/small"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Content-Type": "application/json"
+}
+data = {"signatures": ["5wHu1qwD7..."]}
+
+response = requests.post(url, headers=headers, json=data)
+print(response.json())
+```
+
+</CodeGroup>
+
+<Note>
+  Use this endpoint when you need better performance and don't require complete trade details.
+</Note>

@@ -1,0 +1,200 @@
+---
+title: 'Likes'
+description: 'Manage likes for coins, replies, and other content'
+icon: 'heart'
+---
+
+## Create Like
+
+<ParamField path="method" type="string">
+  POST
+</ParamField>
+
+<ParamField path="endpoint" type="string">
+  /likes/{targetId}
+</ParamField>
+
+Adds a like to the specified target (coin, reply, or other content).
+
+### Authentication
+
+Requires JWT authentication via `Authorization: Bearer <token>` header.
+
+### Path Parameters
+
+<ParamField path="targetId" type="string" required>
+  The unique identifier of the target to like (coin address, reply ID, etc.)
+</ParamField>
+
+### Response
+
+<ResponseField name="201" type="object">
+  Created - Like added successfully
+</ResponseField>
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/likes/<targetId>" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/likes/<targetId>"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.post(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+fetch('https://frontend-api-v3.pump.fun/likes/<targetId>', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer <your_token>',
+    'Accept': 'application/json'
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data));
+```
+</CodeGroup>
+
+---
+
+## Remove Like
+
+<ParamField path="method" type="string">
+  DELETE
+</ParamField>
+
+<ParamField path="endpoint" type="string">
+  /likes/{targetId}
+</ParamField>
+
+Removes a like from the specified target.
+
+### Authentication
+
+Requires JWT authentication via `Authorization: Bearer <token>` header.
+
+### Path Parameters
+
+<ParamField path="targetId" type="string" required>
+  The unique identifier of the target to unlike
+</ParamField>
+
+### Response
+
+<ResponseField name="200" type="object">
+  Success - Like removed successfully
+</ResponseField>
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE "https://frontend-api-v3.pump.fun/likes/<targetId>" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/likes/<targetId>"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.delete(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+fetch('https://frontend-api-v3.pump.fun/likes/<targetId>', {
+  method: 'DELETE',
+  headers: {
+    'Authorization': 'Bearer <your_token>',
+    'Accept': 'application/json'
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data));
+```
+</CodeGroup>
+
+---
+
+## Get Likes
+
+<ParamField path="method" type="string">
+  GET
+</ParamField>
+
+<ParamField path="endpoint" type="string">
+  /likes/{targetId}
+</ParamField>
+
+Retrieves all likes for a specific target.
+
+### Authentication
+
+Requires JWT authentication via `Authorization: Bearer <token>` header.
+
+### Path Parameters
+
+<ParamField path="targetId" type="string" required>
+  The unique identifier of the target to get likes for
+</ParamField>
+
+### Response
+
+<ResponseField name="200" type="object">
+  Success - Returns list of likes
+  <Expandable title="response">
+    <ResponseField name="likes" type="array">
+      Array of like objects
+    </ResponseField>
+    <ResponseField name="count" type="number">
+      Total number of likes
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/likes/<targetId>" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/likes/<targetId>"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+fetch('https://frontend-api-v3.pump.fun/likes/<targetId>', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer <your_token>',
+    'Accept': 'application/json'
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data));
+```
+</CodeGroup>

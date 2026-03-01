@@ -1,0 +1,95 @@
+---
+title: 'Users & Authentication'
+description: 'Complete guide to user authentication and profile management in the Pump.fun API'
+---
+
+## Overview
+
+The Users & Authentication API provides endpoints for managing user accounts, authentication, and permissions within the Pump.fun platform. These endpoints handle user registration, login/logout operations, profile retrieval, and permission checks.
+
+## Base URL
+
+```
+https://frontend-api-v3.pump.fun
+```
+
+## Authentication
+
+All endpoints in this section require JWT authentication via the `Authorization` header:
+
+```
+Authorization: Bearer <your_jwt_token>
+```
+
+<Warning>
+  Always keep your JWT token secure and never expose it in client-side code or public repositories.
+</Warning>
+
+## Common Headers
+
+| Header | Value | Required |
+|--------|-------|----------|
+| `Authorization` | `Bearer <JWT>` | Yes |
+| `Accept` | `application/json` | Yes |
+| `Origin` | `https://pump.fun` | Yes |
+| `Content-Type` | `application/json` | For POST requests |
+
+## Endpoints Overview
+
+### Authentication
+
+- **POST /auth/login** - Authenticate a user and obtain a JWT token
+- **POST /auth/logout** - Invalidate the current user session
+- **GET /auth/my-profile** - Retrieve the authenticated user's profile information
+
+### User Management
+
+- **POST /users/register** - Register a new user account
+- **GET /users/{id}** - Retrieve a specific user's profile by ID
+- **DELETE /users** - Delete the authenticated user's account
+
+### Permissions & Access Control
+
+- **GET /auth/is-admin** - Check if the authenticated user has admin privileges
+- **GET /auth/is-super-admin** - Check if the authenticated user has super admin privileges
+- **GET /auth/is-valid-jurisdiction** - Verify if the user's jurisdiction is valid for platform access
+
+## Rate Limiting
+
+Authentication endpoints are subject to rate limiting to prevent abuse:
+
+- Check response headers for rate limit information:
+  - `x-ratelimit-limit` - Maximum requests allowed
+  - `x-ratelimit-remaining` - Remaining requests in current window
+  - `x-ratelimit-reset` - Time when the rate limit resets
+
+## Error Responses
+
+### Common Status Codes
+
+| Status Code | Description |
+|-------------|-------------|
+| `200 OK` | Request successful |
+| `201 Created` | Resource created successfully |
+| `400 Bad Request` | Invalid request parameters |
+| `401 Unauthorized` | Missing or invalid authentication token |
+| `403 Forbidden` | Insufficient permissions |
+| `404 Not Found` | User or resource not found |
+| `429 Too Many Requests` | Rate limit exceeded |
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Get Profile" icon="user" href="/api-reference/users/get-profile">
+    Retrieve authenticated user profile information
+  </Card>
+  <Card title="Login" icon="right-to-bracket" href="/api-reference/users/login">
+    Authenticate users and obtain JWT tokens
+  </Card>
+  <Card title="Register" icon="user-plus" href="/api-reference/users/register">
+    Create new user accounts
+  </Card>
+  <Card title="Permissions" icon="shield-check" href="/api-reference/users/permissions">
+    Check user roles and access levels
+  </Card>
+</CardGroup>

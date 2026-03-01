@@ -1,0 +1,292 @@
+---
+title: 'User Registration & Management'
+description: 'Register new users and manage user accounts'
+---
+
+## Register New User
+
+<api method="POST" endpoint="https://frontend-api-v3.pump.fun/users/register" />
+
+Registers a new user account on the Pump.fun platform.
+
+### Authentication
+
+Requires JWT authentication via `Authorization: Bearer <token>` header.
+
+### Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for authentication
+  
+  ```
+  Authorization: Bearer <your_jwt_token>
+  ```
+</ParamField>
+
+<ParamField header="Accept" type="string" required>
+  Response content type
+  
+  ```
+  Accept: application/json
+  ```
+</ParamField>
+
+<ParamField header="Origin" type="string" required>
+  Request origin
+  
+  ```
+  Origin: https://pump.fun
+  ```
+</ParamField>
+
+### Response
+
+<ResponseField name="201" type="object">
+  User successfully registered
+</ResponseField>
+
+### Example Usage
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/users/register" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json" \
+  -H "Origin: https://pump.fun"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/users/register"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Origin": "https://pump.fun"
+}
+
+response = requests.post(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+const url = "https://frontend-api-v3.pump.fun/users/register";
+
+const response = await fetch(url, {
+  method: "POST",
+  headers: {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Origin": "https://pump.fun"
+  }
+});
+
+const data = await response.json();
+console.log(data);
+```
+
+</CodeGroup>
+
+---
+
+## Get User by ID
+
+<api method="GET" endpoint="https://frontend-api-v3.pump.fun/users/{id}" />
+
+Retrieve a specific user's profile information by their user ID.
+
+### Authentication
+
+Requires JWT authentication via `Authorization: Bearer <token>` header.
+
+### Path Parameters
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the user to retrieve
+</ParamField>
+
+### Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for authentication
+  
+  ```
+  Authorization: Bearer <your_jwt_token>
+  ```
+</ParamField>
+
+<ParamField header="Accept" type="string" required>
+  Response content type
+  
+  ```
+  Accept: application/json
+  ```
+</ParamField>
+
+### Response
+
+<ResponseField name="200" type="object">
+  User profile retrieved successfully
+</ResponseField>
+
+### Response Schema
+
+<ResponseField name="id" type="string">
+  Unique user identifier
+</ResponseField>
+
+<ResponseField name="username" type="string">
+  User's display name
+</ResponseField>
+
+<ResponseField name="createdAt" type="string">
+  Account creation timestamp
+</ResponseField>
+
+### Example Usage
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/users/<user_id>" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json" \
+  -H "Origin: https://pump.fun"
+```
+
+```python Python
+import requests
+
+user_id = "<user_id>"
+url = f"https://frontend-api-v3.pump.fun/users/{user_id}"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Origin": "https://pump.fun"
+}
+
+response = requests.get(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+const userId = "<user_id>";
+const url = `https://frontend-api-v3.pump.fun/users/${userId}`;
+
+const response = await fetch(url, {
+  method: "GET",
+  headers: {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Origin": "https://pump.fun"
+  }
+});
+
+const data = await response.json();
+console.log(data);
+```
+
+</CodeGroup>
+
+### Error Responses
+
+<ResponseField name="404" type="object">
+  User not found
+  
+  ```json
+  {
+    "statusCode": 404,
+    "message": "User not found"
+  }
+  ```
+</ResponseField>
+
+---
+
+## Delete User Account
+
+<api method="DELETE" endpoint="https://frontend-api-v3.pump.fun/users" />
+
+Delete the authenticated user's account. This action is permanent and cannot be undone.
+
+### Authentication
+
+Requires JWT authentication via `Authorization: Bearer <token>` header.
+
+<Warning>
+  This action permanently deletes the user account and all associated data. This operation cannot be reversed.
+</Warning>
+
+### Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for authentication
+  
+  ```
+  Authorization: Bearer <your_jwt_token>
+  ```
+</ParamField>
+
+<ParamField header="Accept" type="string" required>
+  Response content type
+  
+  ```
+  Accept: application/json
+  ```
+</ParamField>
+
+### Response
+
+<ResponseField name="200" type="object">
+  User account deleted successfully
+</ResponseField>
+
+### Example Usage
+
+<CodeGroup>
+
+```bash cURL
+curl -X DELETE "https://frontend-api-v3.pump.fun/users" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json" \
+  -H "Origin: https://pump.fun"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/users"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Origin": "https://pump.fun"
+}
+
+response = requests.delete(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+const url = "https://frontend-api-v3.pump.fun/users";
+
+const response = await fetch(url, {
+  method: "DELETE",
+  headers: {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Origin": "https://pump.fun"
+  }
+});
+
+const data = await response.json();
+console.log(data);
+```
+
+</CodeGroup>
+
+## Related Endpoints
+
+- [GET /auth/my-profile](/api-reference/users/get-profile) - Get current user profile
+- [POST /auth/login](/api-reference/users/login) - Authenticate user
+- [POST /auth/logout](/api-reference/users/login#logout) - End session

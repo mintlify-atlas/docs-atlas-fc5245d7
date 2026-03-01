@@ -1,0 +1,370 @@
+---
+title: User interactions
+description: Implement likes, follows, bookmarks, and replies for social engagement
+---
+
+The Pump.fun API supports various social interactions including likes, follows, bookmarks, and replies. This guide shows you how to implement these features.
+
+## Likes
+
+### Like a coin or reply
+
+Add a like to a target (coin or reply) using its ID:
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/likes/CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+target_id = "CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump"
+url = f"https://frontend-api-v3.pump.fun/likes/{target_id}"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.post(url, headers=headers)
+result = response.json()
+```
+</CodeGroup>
+
+### Unlike a coin or reply
+
+Remove a like from a target:
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE "https://frontend-api-v3.pump.fun/likes/CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+target_id = "CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump"
+url = f"https://frontend-api-v3.pump.fun/likes/{target_id}"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.delete(url, headers=headers)
+result = response.json()
+```
+</CodeGroup>
+
+<Tip>
+The `targetId` can be either a coin mint address or a reply ID, making the likes system flexible across different content types.
+</Tip>
+
+## Follows
+
+### Follow a user
+
+Follow another user by their user ID:
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/following/user123?captchaToken=<token>" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+user_id = "user123"
+url = f"https://frontend-api-v3.pump.fun/following/{user_id}"
+params = {"captchaToken": "<token>"}
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.post(url, headers=headers, params=params)
+result = response.json()
+```
+</CodeGroup>
+
+### Unfollow a user
+
+Remove a user from your following list:
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE "https://frontend-api-v3.pump.fun/following/user123" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+user_id = "user123"
+url = f"https://frontend-api-v3.pump.fun/following/{user_id}"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.delete(url, headers=headers)
+result = response.json()
+```
+</CodeGroup>
+
+<Note>
+Following users requires a valid captcha token to prevent automated abuse.
+</Note>
+
+## Bookmarks
+
+### Add items to bookmarks
+
+Add one or more items to your bookmark collections:
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/bookmarks/items/add" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "itemId": "CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump",
+    "bookmarkIds": ["bookmark1", "bookmark2"]
+  }'
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/bookmarks/items/add"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Content-Type": "application/json"
+}
+data = {
+    "itemId": "CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump",
+    "bookmarkIds": ["bookmark1", "bookmark2"]
+}
+
+response = requests.post(url, headers=headers, json=data)
+result = response.json()
+```
+</CodeGroup>
+
+### Remove items from bookmarks
+
+Remove items from your bookmark collections:
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/bookmarks/items/remove" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "itemId": "CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump",
+    "bookmarkIds": ["bookmark1"]
+  }'
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/bookmarks/items/remove"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Content-Type": "application/json"
+}
+data = {
+    "itemId": "CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump",
+    "bookmarkIds": ["bookmark1"]
+}
+
+response = requests.post(url, headers=headers, json=data)
+result = response.json()
+```
+</CodeGroup>
+
+### Get bookmark items
+
+Retrieve items from a specific bookmark collection:
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/coins/bookmarks/bookmark1?limit=50&offset=0&includeNsfw=false" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+bookmark_id = "bookmark1"
+url = f"https://frontend-api-v3.pump.fun/coins/bookmarks/{bookmark_id}"
+params = {
+    "limit": 50,
+    "offset": 0,
+    "includeNsfw": False
+}
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, headers=headers, params=params)
+bookmarked_items = response.json()
+```
+</CodeGroup>
+
+## Replies
+
+### Create a reply
+
+Post a reply to a coin's thread:
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/replies" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mint": "CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump",
+    "text": "Great project!",
+    "captchaToken": "<token>"
+  }'
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/replies"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Content-Type": "application/json"
+}
+data = {
+    "mint": "CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump",
+    "text": "Great project!",
+    "captchaToken": "<token>"
+}
+
+response = requests.post(url, headers=headers, json=data)
+reply = response.json()
+```
+</CodeGroup>
+
+### Get replies for a coin
+
+Retrieve all replies for a specific coin:
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/replies/CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump?limit=50&offset=0" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+mint = "CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump"
+url = f"https://frontend-api-v3.pump.fun/replies/{mint}"
+params = {
+    "limit": 50,
+    "offset": 0
+}
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, headers=headers, params=params)
+replies = response.json()
+```
+</CodeGroup>
+
+<Warning>
+Creating replies requires a valid captcha token to prevent spam. Make sure to implement proper captcha verification in your application.
+</Warning>
+
+## Complete interaction example
+
+Here's a complete example showing multiple interactions:
+
+```python Python
+import requests
+
+class PumpFunInteractions:
+    def __init__(self, token):
+        self.base_url = "https://frontend-api-v3.pump.fun"
+        self.headers = {
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        }
+    
+    def like_coin(self, mint):
+        """Like a coin"""
+        url = f"{self.base_url}/likes/{mint}"
+        return requests.post(url, headers=self.headers).json()
+    
+    def follow_user(self, user_id, captcha_token):
+        """Follow a user"""
+        url = f"{self.base_url}/following/{user_id}"
+        params = {"captchaToken": captcha_token}
+        return requests.post(url, headers=self.headers, params=params).json()
+    
+    def bookmark_coin(self, mint, bookmark_ids):
+        """Add coin to bookmarks"""
+        url = f"{self.base_url}/bookmarks/items/add"
+        data = {"itemId": mint, "bookmarkIds": bookmark_ids}
+        return requests.post(url, headers=self.headers, json=data).json()
+    
+    def post_reply(self, mint, text, captcha_token):
+        """Post a reply to a coin"""
+        url = f"{self.base_url}/replies"
+        data = {
+            "mint": mint,
+            "text": text,
+            "captchaToken": captcha_token
+        }
+        return requests.post(url, headers=self.headers, json=data).json()
+
+# Usage
+api = PumpFunInteractions("your_token_here")
+mint = "CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump"
+
+# Like the coin
+api.like_coin(mint)
+
+# Bookmark it
+api.bookmark_coin(mint, ["favorites"])
+
+# Post a reply
+api.post_reply(mint, "Interesting project!", "captcha_token")
+```
+
+## Best practices
+
+<Steps>
+  <Step title="Implement captcha verification">
+    Always use valid captcha tokens for operations that create content (follows, replies) to prevent abuse.
+  </Step>
+  
+  <Step title="Handle rate limits">
+    Implement exponential backoff when receiving rate limit errors (429 status codes).
+  </Step>
+  
+  <Step title="Validate input">
+    Sanitize user-generated content before posting replies to prevent injection attacks.
+  </Step>
+  
+  <Step title="Cache user state">
+    Store like/follow/bookmark state locally to avoid redundant API calls.
+  </Step>
+</Steps>

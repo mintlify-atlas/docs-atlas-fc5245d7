@@ -1,0 +1,119 @@
+---
+title: 'Get Coins List'
+api: 'GET https://advanced-api-v2.pump.fun/coins/list'
+description: 'Retrieve a list of coins with advanced filtering options'
+---
+
+## Overview
+
+The Coins List endpoint provides access to a comprehensive list of coins available on Pump.fun. This endpoint is part of the advanced API and requires authentication.
+
+## Authentication
+
+This endpoint requires JWT authentication via the `Authorization` header:
+
+```bash
+Authorization: Bearer <your_token>
+```
+
+## Endpoint
+
+```
+GET https://advanced-api-v2.pump.fun/coins/list
+```
+
+## Parameters
+
+This endpoint does not require any parameters.
+
+## Response
+
+<ResponseField name="data" type="array">
+  Array of coin objects with detailed information
+  
+  <Expandable title="Coin Object">
+    <ResponseField name="mint" type="string">
+      The unique mint address of the coin
+    </ResponseField>
+    
+    <ResponseField name="name" type="string">
+      The name of the coin
+    </ResponseField>
+    
+    <ResponseField name="symbol" type="string">
+      The ticker symbol of the coin
+    </ResponseField>
+    
+    <ResponseField name="description" type="string">
+      Description of the coin
+    </ResponseField>
+    
+    <ResponseField name="imageUri" type="string">
+      URL to the coin's image
+    </ResponseField>
+    
+    <ResponseField name="metadataUri" type="string">
+      URI to the coin's metadata
+    </ResponseField>
+    
+    <ResponseField name="createdTimestamp" type="number">
+      Unix timestamp when the coin was created
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://advanced-api-v2.pump.fun/coins/list" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://advanced-api-v2.pump.fun/coins/list"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+fetch('https://advanced-api-v2.pump.fun/coins/list', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer <your_token>',
+    'Accept': 'application/json'
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data));
+```
+
+```typescript TypeScript
+const response = await fetch('https://advanced-api-v2.pump.fun/coins/list', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer <your_token>',
+    'Accept': 'application/json'
+  }
+});
+
+const data = await response.json();
+console.log(data);
+```
+
+</CodeGroup>
+
+## Notes
+
+- Replace `<your_token>` with your actual JWT token
+- The response includes comprehensive coin data for analysis
+- This endpoint provides the foundation for advanced coin analytics

@@ -1,0 +1,382 @@
+---
+title: 'Error Handling'
+description: 'Understand and handle errors from the Pump.fun API'
+---
+
+## Overview
+
+The Pump.fun API uses standard HTTP status codes to indicate the success or failure of requests. Understanding these status codes and implementing proper error handling is essential for building robust applications.
+
+## HTTP Status Codes
+
+### Success Codes
+
+<ParamField path="200" type="OK">
+  Request succeeded. The response body contains the requested data.
+</ParamField>
+
+<ParamField path="201" type="Created">
+  Resource successfully created. Common for POST requests that create new resources.
+</ParamField>
+
+<ParamField path="304" type="Not Modified">
+  Content hasn't changed since the last request. Used with ETag caching. See [Caching](/essentials/caching) for details.
+</ParamField>
+
+### Client Error Codes
+
+<ParamField path="400" type="Bad Request">
+  The request is malformed or contains invalid parameters. Check your request body, query parameters, and headers.
+</ParamField>
+
+<ParamField path="401" type="Unauthorized">
+  Authentication is required or the provided JWT token is invalid or expired. Include a valid token in the Authorization header.
+</ParamField>
+
+<ParamField path="403" type="Forbidden">
+  The request is authenticated but you don't have permission to access the resource. This may indicate insufficient privileges.
+</ParamField>
+
+<ParamField path="404" type="Not Found">
+  The requested resource doesn't exist. Verify the endpoint URL and resource identifiers.
+</ParamField>
+
+<ParamField path="429" type="Too Many Requests">
+  You've exceeded the rate limit. Slow down your requests and check the rate limit headers. See [Rate Limiting](/essentials/rate-limiting) for details.
+</ParamField>
+
+### Server Error Codes
+
+<ParamField path="500" type="Internal Server Error">
+  The server encountered an unexpected error. Retry your request after a brief delay.
+</ParamField>
+
+<ParamField path="502" type="Bad Gateway">
+  The server received an invalid response from an upstream server. Retry after a delay.
+</ParamField>
+
+<ParamField path="503" type="Service Unavailable">
+  The service is temporarily unavailable. This may occur during maintenance. Retry with exponential backoff.
+</ParamField>
+
+## Error Response Format
+
+When an error occurs, the API typically returns a JSON response with error details:
+
+```json
+{
+  "error": "Error type or message",
+  "message": "Detailed description of what went wrong",
+  "statusCode": 400
+}
+```
+
+<Note>
+The exact error response format may vary by endpoint. Always check the response body for additional context when debugging errors.
+</Note>
+
+## Handling Errors
+
+### Basic Error Handling
+
+<CodeGroup>
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/coins/{mint}"
+headers = {
+    "Authorization": "Bearer <your_jwt_token>",
+    "Accept": "application/json"
+}
+
+try:
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()  # Raises HTTPError for bad status codes
+    
+    data = response.json()
+    print("Success:", data)
+    
+except requests.exceptions.HTTPError as e:
+    status_code = e.response.status_code
+    
+    if status_code == 401:
+        print("Authentication failed. Check your JWT token.")
+    elif status_code == 403:
+        print("Access forbidden. Insufficient permissions.")
+    elif status_code == 404:
+        print("Resource not found.")
+    elif status_code == 429:
+        print("Rate limit exceeded. Slow down requests.")
+    else:
+        print(f"HTTP error occurred: {e}")
+        
+except requests.exceptions.RequestException as e:
+    print(f"Request failed: {e}")
+```
+
+```javascript JavaScript
+try {
+  const response = await fetch('https://frontend-api-v3.pump.fun/coins/{mint}', {
+    headers: {
+      'Authorization': 'Bearer <your_jwt_token>',
+      'Accept': 'application/json'
+    }
+  });
+  
+  if (!response.ok) {
+    const error = await response.json();
+    
+    switch (response.status) {
+      case 401:
+        console.error('Authentication failed. Check your JWT token.');
+        break;
+      case 403:
+        console.error('Access forbidden. Insufficient permissions.');
+        break;
+      case 404:
+        console.error('Resource not found.');
+        break;
+      case 429:
+        console.error('Rate limit exceeded. Slow down requests.');
+        break;
+      default:
+        console.error('Error:', error.message);
+    }
+    
+    throw new Error(`HTTP ${response.status}: ${error.message}`);
+  }
+  
+  const data = await response.json();
+  console.log('Success:', data);
+  
+} catch (error) {
+  console.error('Request failed:', error.message);
+}
+```
+
+```bash cURL
+# cURL with error handling
+curl -X GET "https://frontend-api-v3.pump.fun/coins/{mint}" \
+  -H "Authorization: Bearer <your_jwt_token>" \
+  -H "Accept: application/json" \
+  -w "\nHTTP Status: %{http_code}\n" \
+  -o response.json
+
+# Check exit code
+if [ $? -eq 0 ]; then
+    echo "Request successful"
+else
+    echo "Request failed"
+fi
+```
+</CodeGroup>
+
+### Advanced Error Handling with Retries
+
+<CodeGroup>
+```python Python
+import requests
+import time
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
+
+def create_session_with_retries():
+    session = requests.Session()
+    
+    # Retry on 500, 502, 503, 504 errors
+    retry_strategy = Retry(
+        total=3,
+        status_forcelist=[500, 502, 503, 504],
+        backoff_factor=1,  # Wait 1, 2, 4 seconds between retries
+        allowed_methods=["GET", "POST"]
+    )
+    
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    session.mount("https://", adapter)
+    
+    return session
+
+def make_request_with_retry(url, headers, max_attempts=3):
+    session = create_session_with_retries()
+    
+    for attempt in range(max_attempts):
+        try:
+            response = session.get(url, headers=headers, timeout=10)
+            
+            if response.status_code == 429:
+                # Rate limited - check retry-after header
+                retry_after = int(response.headers.get('Retry-After', 60))
+                print(f"Rate limited. Waiting {retry_after} seconds...")
+                time.sleep(retry_after)
+                continue
+            
+            response.raise_for_status()
+            return response.json()
+            
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 401:
+                # Authentication error - don't retry
+                raise
+            elif attempt < max_attempts - 1:
+                # Exponential backoff
+                wait_time = (2 ** attempt)
+                print(f"Request failed. Retrying in {wait_time}s...")
+                time.sleep(wait_time)
+            else:
+                raise
+    
+    raise Exception("Max retry attempts exceeded")
+
+# Usage
+url = "https://frontend-api-v3.pump.fun/coins/{mint}"
+headers = {"Authorization": "Bearer <token>", "Accept": "application/json"}
+
+try:
+    data = make_request_with_retry(url, headers)
+    print("Success:", data)
+except Exception as e:
+    print(f"Request failed: {e}")
+```
+
+```javascript JavaScript
+class APIClient {
+  constructor(token) {
+    this.baseURL = 'https://frontend-api-v3.pump.fun';
+    this.token = token;
+  }
+  
+  async makeRequest(endpoint, options = {}, maxAttempts = 3) {
+    const url = `${this.baseURL}${endpoint}`;
+    
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      try {
+        const response = await fetch(url, {
+          ...options,
+          headers: {
+            'Authorization': `Bearer ${this.token}`,
+            'Accept': 'application/json',
+            ...options.headers
+          }
+        });
+        
+        // Handle rate limiting
+        if (response.status === 429) {
+          const retryAfter = parseInt(response.headers.get('Retry-After') || '60');
+          console.log(`Rate limited. Waiting ${retryAfter}s...`);
+          await this.sleep(retryAfter * 1000);
+          continue;
+        }
+        
+        // Handle server errors with retry
+        if (response.status >= 500 && attempt < maxAttempts - 1) {
+          const waitTime = Math.pow(2, attempt) * 1000;
+          console.log(`Server error. Retrying in ${waitTime/1000}s...`);
+          await this.sleep(waitTime);
+          continue;
+        }
+        
+        // Don't retry authentication errors
+        if (response.status === 401) {
+          throw new Error('Authentication failed');
+        }
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(`HTTP ${response.status}: ${error.message}`);
+        }
+        
+        return await response.json();
+        
+      } catch (error) {
+        if (attempt === maxAttempts - 1) {
+          throw error;
+        }
+      }
+    }
+  }
+  
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+}
+
+// Usage
+const client = new APIClient('<your_jwt_token>');
+
+try {
+  const data = await client.makeRequest('/coins/{mint}');
+  console.log('Success:', data);
+} catch (error) {
+  console.error('Request failed:', error.message);
+}
+```
+</CodeGroup>
+
+## Common Error Scenarios
+
+<Accordion title="401 Unauthorized - Invalid or Expired Token">
+  **Problem:** Your JWT token is missing, invalid, or has expired.
+  
+  **Solution:**
+  - Verify you're including the Authorization header
+  - Check the token format: `Bearer <token>`
+  - Re-authenticate using the `/auth/login` endpoint to obtain a fresh token
+  - Implement automatic token refresh in your application
+</Accordion>
+
+<Accordion title="403 Forbidden - Insufficient Permissions">
+  **Problem:** Your account doesn't have permission to access the resource.
+  
+  **Solution:**
+  - Verify your account has the necessary permissions
+  - Check if the endpoint requires admin or super admin privileges
+  - Contact support if you believe you should have access
+</Accordion>
+
+<Accordion title="404 Not Found - Invalid Endpoint or Resource">
+  **Problem:** The endpoint or resource doesn't exist.
+  
+  **Solution:**
+  - Verify the endpoint URL is correct
+  - Check that resource identifiers (mint addresses, user IDs) are valid
+  - Ensure you're using the correct API version (v3 is current)
+</Accordion>
+
+<Accordion title="429 Too Many Requests - Rate Limit Exceeded">
+  **Problem:** You've sent too many requests in a short period.
+  
+  **Solution:**
+  - Check the `x-ratelimit-*` response headers for limit information
+  - Implement rate limiting in your application
+  - Use exponential backoff when retrying
+  - See [Rate Limiting](/essentials/rate-limiting) for best practices
+</Accordion>
+
+<Accordion title="500/502/503 Server Errors">
+  **Problem:** The server encountered an error or is temporarily unavailable.
+  
+  **Solution:**
+  - Retry the request after a delay
+  - Implement exponential backoff (wait 1s, 2s, 4s, etc.)
+  - Check the API status page for known issues
+  - If errors persist, contact support
+</Accordion>
+
+## Best Practices
+
+<Warning>
+Always implement proper error handling in production applications. Unhandled errors can lead to poor user experience and application crashes.
+</Warning>
+
+1. **Log errors with context** - Include the endpoint, request parameters, and timestamp
+2. **Retry transient failures** - Use exponential backoff for 5xx errors and rate limits
+3. **Don't retry authentication errors** - 401 errors require re-authentication, not retries
+4. **Handle rate limits gracefully** - Respect the `Retry-After` header
+5. **Monitor error rates** - Track error patterns to identify systemic issues
+6. **Provide user feedback** - Display meaningful error messages to end users
+
+## Related Guides
+
+- [Authentication](/essentials/authentication) - Learn about JWT token management
+- [Rate Limiting](/essentials/rate-limiting) - Understand rate limits and how to avoid them
+- [Caching](/essentials/caching) - Use caching to reduce errors and improve performance

@@ -1,0 +1,179 @@
+---
+title: 'Get Profile'
+api: 'GET https://frontend-api-v3.pump.fun/auth/my-profile'
+description: 'Retrieve the authenticated user profile information'
+---
+
+## Overview
+
+Retrieves the profile information for the currently authenticated user. This endpoint returns user details associated with the JWT token provided in the request.
+
+## Authentication
+
+Requires JWT authentication via `Authorization: Bearer <token>` header.
+
+## Request
+
+### Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for authentication
+  
+  ```
+  Authorization: Bearer <your_jwt_token>
+  ```
+</ParamField>
+
+<ParamField header="Accept" type="string" required>
+  Response content type
+  
+  ```
+  Accept: application/json
+  ```
+</ParamField>
+
+<ParamField header="Origin" type="string" required>
+  Request origin
+  
+  ```
+  Origin: https://pump.fun
+  ```
+</ParamField>
+
+## Response
+
+<ResponseField name="200" type="object">
+  Successfully retrieved user profile information
+</ResponseField>
+
+### Response Schema
+
+The response contains the authenticated user's profile data, including:
+
+<ResponseField name="id" type="string">
+  Unique user identifier
+</ResponseField>
+
+<ResponseField name="username" type="string">
+  User's display name
+</ResponseField>
+
+<ResponseField name="email" type="string">
+  User's email address
+</ResponseField>
+
+<ResponseField name="createdAt" type="string">
+  Account creation timestamp
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string">
+  Last profile update timestamp
+</ResponseField>
+
+## Example Usage
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/auth/my-profile" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json" \
+  -H "Origin: https://pump.fun"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/auth/my-profile"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Origin": "https://pump.fun"
+}
+
+response = requests.get(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+const url = "https://frontend-api-v3.pump.fun/auth/my-profile";
+
+const response = await fetch(url, {
+  method: "GET",
+  headers: {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Origin": "https://pump.fun"
+  }
+});
+
+const data = await response.json();
+console.log(data);
+```
+
+```typescript TypeScript
+interface UserProfile {
+  id: string;
+  username: string;
+  email: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const url = "https://frontend-api-v3.pump.fun/auth/my-profile";
+
+const response = await fetch(url, {
+  method: "GET",
+  headers: {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Origin": "https://pump.fun"
+  }
+});
+
+const profile: UserProfile = await response.json();
+console.log(profile);
+```
+
+</CodeGroup>
+
+## Error Responses
+
+<ResponseField name="401" type="object">
+  Unauthorized - Invalid or missing JWT token
+  
+  ```json
+  {
+    "statusCode": 401,
+    "message": "Unauthorized"
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="403" type="object">
+  Forbidden - Valid token but insufficient permissions
+  
+  ```json
+  {
+    "statusCode": 403,
+    "message": "Forbidden resource"
+  }
+  ```
+</ResponseField>
+
+<Warning>
+  Ensure your JWT token is valid and has not expired. Expired tokens will result in a 401 Unauthorized response.
+</Warning>
+
+## Use Cases
+
+- Retrieve current user information for profile display
+- Verify user authentication status
+- Fetch user preferences and settings
+- Validate user session on page load
+
+## Related Endpoints
+
+- [GET /users/{id}](/api-reference/users/register#get-user-by-id) - Get another user's profile by ID
+- [POST /auth/login](/api-reference/users/login) - Authenticate and obtain JWT token
+- [POST /auth/logout](/api-reference/users/login#logout) - End user session

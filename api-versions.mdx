@@ -1,0 +1,332 @@
+---
+title: API versions
+description: Understand the different Pump.fun API versions, their base URLs, current status, and key differences between versions.
+---
+
+# API versions
+
+Pump.fun maintains multiple API versions to support different use cases and maintain backward compatibility. This guide explains the available API versions and how to choose the right one for your application.
+
+## Overview
+
+The Pump.fun platform uses several API domains:
+
+<CardGroup cols={2}>
+  <Card title="Frontend API v3" icon="circle-check">
+    **Current** - Primary API for most operations
+  </Card>
+  <Card title="Advanced Analytics v2" icon="chart-line">
+    **Current** - Specialized analytics and market data
+  </Card>
+  <Card title="Frontend API v2" icon="circle-xmark">
+    **Deprecated** - Legacy version, migrate to v3
+  </Card>
+  <Card title="Frontend API v1" icon="circle-xmark">
+    **Deprecated** - Legacy version, migrate to v3
+  </Card>
+</CardGroup>
+
+## Frontend API v3 (Current)
+
+<Note>
+  This is the current and recommended version for all frontend operations.
+</Note>
+
+### Base URL
+
+```
+https://frontend-api-v3.pump.fun/
+```
+
+### Status
+
+**Current** - Actively maintained and recommended for all new integrations
+
+### Key features
+
+- Complete token lifecycle management (creation, trading, metadata)
+- User authentication and profile management
+- Trade history and real-time data
+- Social features (likes, comments, follows)
+- Livestream integration
+- Bookmark and notification systems
+- Moderation tools
+
+### Example endpoints
+
+<CodeGroup>
+  ```bash Get latest coin
+  curl -X GET "https://frontend-api-v3.pump.fun/coins/latest" \
+    -H "Authorization: Bearer <your_token>" \
+    -H "Accept: application/json"
+  ```
+
+  ```bash Get SOL price
+  curl -X GET "https://frontend-api-v3.pump.fun/sol-price" \
+    -H "Authorization: Bearer <your_token>" \
+    -H "Accept: application/json"
+  ```
+
+  ```bash Get user profile
+  curl -X GET "https://frontend-api-v3.pump.fun/auth/my-profile" \
+    -H "Authorization: Bearer <your_token>" \
+    -H "Accept: application/json"
+  ```
+
+  ```bash Get coin details
+  curl -X GET "https://frontend-api-v3.pump.fun/coins/{mint}?sync=true" \
+    -H "Authorization: Bearer <your_token>" \
+    -H "Accept: application/json"
+  ```
+</CodeGroup>
+
+### Common operations
+
+- `GET /coins/latest` - Retrieve the most recently created coin
+- `GET /coins/{mint}` - Get details for a specific token
+- `POST /coins/create` - Create a new token
+- `GET /trades/all/{mint}` - Get trade history for a token
+- `GET /auth/my-profile` - Retrieve authenticated user profile
+- `GET /sol-price` - Get current Solana price
+
+## Advanced Analytics API v2
+
+<Note>
+  Use this API for advanced market analysis and specialized queries.
+</Note>
+
+### Base URL
+
+```
+https://advanced-api-v2.pump.fun/
+```
+
+### Status
+
+**Current** - Specialized API for analytics and advanced data queries
+
+### Key features
+
+- Advanced coin analytics and metrics
+- Graduated coin tracking
+- Market search capabilities
+- Enhanced data aggregation
+- KOL (Key Opinion Leader) scanning
+
+### Example endpoints
+
+<CodeGroup>
+  ```bash Get graduated coins
+  curl -X GET "https://advanced-api-v2.pump.fun/coins/graduated" \
+    -H "Authorization: Bearer <your_token>" \
+    -H "Accept: application/json"
+  ```
+
+  ```bash Search tokens
+  curl -X GET "https://advanced-api-v2.pump.fun/search?mint={mint}" \
+    -H "Authorization: Bearer <your_token>" \
+    -H "Accept: application/json"
+  ```
+
+  ```bash Get coin list
+  curl -X GET "https://advanced-api-v2.pump.fun/coins/list" \
+    -H "Authorization: Bearer <your_token>" \
+    -H "Accept: application/json"
+  ```
+</CodeGroup>
+
+### Common operations
+
+- `GET /coins/graduated` - Retrieve tokens that have graduated to Raydium
+- `GET /coins/list` - Get filtered lists of coins
+- `GET /coins/kolscan` - Access KOL scanning data
+- `GET /search` - Search for tokens and data
+
+### When to use
+
+Use the Advanced Analytics API when you need:
+
+- Graduated coin data and analytics
+- Advanced search and filtering capabilities
+- Specialized market metrics
+- KOL tracking and analysis
+
+## Frontend API v2 (Deprecated)
+
+<Warning>
+  This version is deprecated. Migrate to Frontend API v3 for continued support.
+</Warning>
+
+### Base URL
+
+```
+https://frontend-api-v2.pump.fun/
+```
+
+### Status
+
+**Deprecated** - No longer recommended for new integrations
+
+### Migration
+
+If you're using Frontend API v2, migrate to v3 by:
+
+1. Updating your base URL from `frontend-api-v2.pump.fun` to `frontend-api-v3.pump.fun`
+2. Testing all endpoints to ensure compatibility
+3. Reviewing any breaking changes in endpoint behavior
+4. Updating authentication headers if necessary
+
+## Frontend API v1 (Deprecated)
+
+<Warning>
+  This version is deprecated. Migrate to Frontend API v3 for continued support.
+</Warning>
+
+### Base URL
+
+```
+https://frontend-api.pump.fun/
+```
+
+### Status
+
+**Deprecated** - No longer recommended for new integrations
+
+### Migration
+
+If you're using Frontend API v1, migrate to v3 by:
+
+1. Updating your base URL from `frontend-api.pump.fun` to `frontend-api-v3.pump.fun`
+2. Testing all endpoints to ensure compatibility
+3. Reviewing any breaking changes in endpoint behavior
+4. Updating authentication headers if necessary
+
+## Additional API domains
+
+The Pump.fun platform includes specialized API domains for specific functionality:
+
+### Profile API
+
+```
+https://profile-api.pump.fun
+```
+
+User profile operations and settings management.
+
+### Swap API
+
+```
+https://swap-api.pump.fun
+```
+
+Token swap functionality and transaction execution.
+
+### Volatility API v2
+
+```
+https://volatility-api-v2.pump.fun
+```
+
+Market volatility metrics and analysis.
+
+### Clips API
+
+```
+https://clips-api.pump.fun
+```
+
+Livestream clips management and retrieval.
+
+### Market API
+
+```
+https://market-api.pump.fun
+```
+
+Real-time market data and pricing information.
+
+<Note>
+  OpenAPI specifications are not available for these specialized domains. Refer to individual endpoint documentation for details.
+</Note>
+
+## Choosing the right API version
+
+Use this decision tree to select the appropriate API:
+
+<Steps>
+  <Step title="Frontend operations?">
+    **Use Frontend API v3** for:
+    - Token creation and management
+    - User authentication and profiles
+    - Trading operations
+    - Social features
+    - General platform interactions
+  </Step>
+  
+  <Step title="Analytics and advanced data?">
+    **Use Advanced Analytics API v2** for:
+    - Graduated coin tracking
+    - Advanced search queries
+    - Market analysis
+    - KOL data
+  </Step>
+  
+  <Step title="Specialized functionality?">
+    **Use specialized APIs** for:
+    - Profile API - User-specific operations
+    - Swap API - Token swaps
+    - Volatility API - Market volatility
+    - Clips API - Livestream clips
+    - Market API - Real-time market data
+  </Step>
+</Steps>
+
+## Authentication across versions
+
+All API versions require JWT authentication:
+
+```bash
+Authorization: Bearer <your_jwt_token>
+```
+
+Authentication tokens work across all API versions. You don't need separate tokens for different API domains.
+
+<Tip>
+  Keep your JWT token secure and never expose it in client-side code or public repositories.
+</Tip>
+
+## Rate limits
+
+Rate limits vary by endpoint and API version. Monitor rate limit headers in API responses:
+
+- `x-ratelimit-limit` - Total request limit
+- `x-ratelimit-remaining` - Remaining requests in current window
+- `x-ratelimit-reset` - Timestamp when limit resets
+
+See the [Rate Limits](/rate-limits) guide for detailed information.
+
+## OpenAPI specifications
+
+Download OpenAPI specifications for API versions:
+
+- [Frontend API v1 Spec](https://github.com/pump-fun/api-docs/blob/main/discovered/frontend-api.json)
+- [Frontend API v2 Spec](https://github.com/pump-fun/api-docs/blob/main/discovered/frontend-api-v2.json)
+- [Frontend API v3 Spec](https://github.com/pump-fun/api-docs/blob/main/discovered/frontend-api-v3.json)
+- [Advanced Analytics API v2 Spec](https://github.com/pump-fun/api-docs/blob/main/discovered/advanced-api-v2.json)
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Make your first API call with Frontend API v3
+  </Card>
+  <Card title="Authentication" icon="key" href="/essentials/authentication">
+    Learn how to authenticate your API requests
+  </Card>
+  <Card title="Coins API" icon="coins" href="/api-reference/coins/overview">
+    Browse coin-related endpoints
+  </Card>
+  <Card title="Rate limits" icon="gauge-high" href="/essentials/rate-limiting">
+    Understand rate limiting across API versions
+  </Card>
+</CardGroup>

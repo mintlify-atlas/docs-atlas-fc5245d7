@@ -1,0 +1,318 @@
+---
+title: "Reports"
+description: "Handle user-submitted content reports and violations"
+---
+
+## Overview
+
+The Reports API allows users to flag inappropriate content and provides administrators with tools to review, update, and manage these reports.
+
+<Warning>
+  Report retrieval, updates, and deletion require admin authentication. Creating reports may be available to authenticated users depending on your platform configuration.
+</Warning>
+
+## Create Report
+
+Submit a new content report for review.
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/reports" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "targetId": "string",
+    "type": "scam",
+    "reason": "This token appears to be a scam"
+  }'
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/reports"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "targetId": "string",
+    "type": "scam",
+    "reason": "This token appears to be a scam"
+}
+
+response = requests.post(url, headers=headers, json=data)
+print(response.json())
+```
+</CodeGroup>
+
+**Request Body Schema**
+
+Refer to `CreateReportDto` schema for complete field definitions. Typically includes:
+
+<ParamField body="targetId" type="string" required>
+  The ID or mint address of the content being reported
+</ParamField>
+
+<ParamField body="type" type="string" required>
+  The type of report (e.g., "scam", "offensive", "spam", "nsfw")
+</ParamField>
+
+<ParamField body="reason" type="string" required>
+  Detailed explanation of why the content is being reported
+</ParamField>
+
+**Response**
+
+Returns a 201 status code with the created report details.
+
+## Report Comment
+
+Submit a report specifically for comment content.
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/reports/reportComment" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "x-client-key: your_client_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "commentId": "string",
+    "reason": "offensive"
+  }'
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/reports/reportComment"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "x-client-key": "your_client_key",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "commentId": "string",
+    "reason": "offensive"
+}
+
+response = requests.post(url, headers=headers, json=data)
+print(response.json())
+```
+</CodeGroup>
+
+<ParamField header="x-client-key" type="string" required>
+  Client authentication key for the request
+</ParamField>
+
+**Request Body Schema**
+
+Refer to `CreateCommentReportDto` schema for complete field definitions.
+
+<ParamField body="commentId" type="string" required>
+  The ID of the comment being reported
+</ParamField>
+
+<ParamField body="reason" type="string" required>
+  The reason for reporting the comment
+</ParamField>
+
+## Get Reports
+
+Retrieve a list of reports with filtering and pagination options.
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/reports?limit=50&offset=0&type=all&done=false&createdAtFrom=&createdAtTo=&isCurrentlyLive=false" \
+  -H "Authorization: Bearer <your_token>"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/reports"
+headers = {"Authorization": "Bearer <your_token>"}
+
+params = {
+    "limit": 50,
+    "offset": 0,
+    "type": "all",
+    "done": "false",
+    "createdAtFrom": "",
+    "createdAtTo": "",
+    "isCurrentlyLive": "false"
+}
+
+response = requests.get(url, headers=headers, params=params)
+print(response.json())
+```
+</CodeGroup>
+
+**Query Parameters**
+
+<ParamField query="limit" type="number" required>
+  Maximum number of reports to return (e.g., 50)
+</ParamField>
+
+<ParamField query="offset" type="number" required>
+  Number of reports to skip for pagination (e.g., 0 for first page)
+</ParamField>
+
+<ParamField query="type" type="string" required>
+  Filter by report type (e.g., "scam", "offensive", "spam", "all")
+</ParamField>
+
+<ParamField query="done" type="string" required>
+  Filter by resolution status: "true" for resolved, "false" for pending
+</ParamField>
+
+<ParamField query="createdAtFrom" type="string" required>
+  Filter reports created after this date (ISO 8601 format)
+</ParamField>
+
+<ParamField query="createdAtTo" type="string" required>
+  Filter reports created before this date (ISO 8601 format)
+</ParamField>
+
+<ParamField query="isCurrentlyLive" type="string" required>
+  Filter for reports on currently live content ("true" or "false")
+</ParamField>
+
+**Response**
+
+Returns a paginated list of reports with details including:
+- Report ID
+- Target content information
+- Report type and reason
+- Reporter information
+- Created timestamp
+- Resolution status
+
+## Update Report
+
+Update the status or details of an existing report.
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/reports/update" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "reportId": "string",
+    "done": true,
+    "action": "banned",
+    "notes": "Content removed and user banned"
+  }'
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/reports/update"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "reportId": "string",
+    "done": True,
+    "action": "banned",
+    "notes": "Content removed and user banned"
+}
+
+response = requests.post(url, headers=headers, json=data)
+print(response.json())
+```
+</CodeGroup>
+
+**Request Body**
+
+<ParamField body="reportId" type="string" required>
+  The ID of the report to update
+</ParamField>
+
+<ParamField body="done" type="boolean" required>
+  Whether the report has been resolved
+</ParamField>
+
+<ParamField body="action" type="string" required>
+  The action taken (e.g., "banned", "hidden", "ignored", "no_action")
+</ParamField>
+
+<ParamField body="notes" type="string">
+  Additional notes about the resolution
+</ParamField>
+
+## Delete Report
+
+Remove a report from the system (typically after resolution).
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE "https://frontend-api-v3.pump.fun/reports/{id}" \
+  -H "Authorization: Bearer <your_token>"
+```
+
+```python Python
+import requests
+
+report_id = "abc123"
+url = f"https://frontend-api-v3.pump.fun/reports/{report_id}"
+headers = {"Authorization": "Bearer <your_token>"}
+
+response = requests.delete(url, headers=headers)
+print(response.json())
+```
+</CodeGroup>
+
+<ParamField path="id" type="string" required>
+  The ID of the report to delete
+</ParamField>
+
+**Response**
+
+Returns a 200 status code on successful deletion.
+
+<Warning>
+  Deleting a report is permanent. Consider updating the report status instead if you need to maintain audit trails.
+</Warning>
+
+## Report Workflow
+
+A typical report handling workflow:
+
+1. **Submission**: User submits report via `POST /reports`
+2. **Review**: Admin retrieves reports via `GET /reports` with appropriate filters
+3. **Investigation**: Admin reviews reported content and context
+4. **Action**: Admin takes appropriate action:
+   - Mark content as hidden/NSFW via content filtering endpoints
+   - Ban user via ban management endpoints
+   - Ignore if report is invalid
+5. **Update**: Admin updates report via `POST /reports/update`
+6. **Cleanup**: Optionally delete resolved reports via `DELETE /reports/{id}`
+
+## Report Types
+
+Common report types include:
+
+- **scam**: Fraudulent or deceptive content
+- **offensive**: Hate speech or offensive material
+- **spam**: Repetitive or unwanted content
+- **nsfw**: Adult or explicit content
+- **copyright**: Copyright infringement
+- **impersonation**: Fake or misleading identity
+- **other**: Other policy violations
+
+## Best Practices
+
+1. **Respond promptly**: Address high-priority reports quickly
+2. **Investigate thoroughly**: Review context before taking action
+3. **Provide feedback**: Update reports with clear actions taken
+4. **Track patterns**: Monitor reports to identify repeat offenders
+5. **Maintain records**: Keep audit trails of moderation decisions
+6. **Use filters effectively**: Prioritize reports by type and status
+7. **Batch processing**: Handle similar reports together for consistency
+8. **Communicate clearly**: Document reasons for actions in report notes

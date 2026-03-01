@@ -1,0 +1,207 @@
+---
+title: 'Create Coin'
+api: 'POST https://frontend-api-v3.pump.fun/coins/create'
+description: 'Create a new coin on the Pump.fun platform'
+---
+
+## Endpoint
+
+```
+POST https://frontend-api-v3.pump.fun/coins/create
+```
+
+## Authentication
+
+<Note>
+This endpoint requires JWT authentication. Include your token in the Authorization header.
+</Note>
+
+```bash
+Authorization: Bearer <your_token>
+```
+
+## Request Body
+
+The request body should be sent as `application/json` with the following structure:
+
+<ParamField body="name" type="string" required>
+  The name of the coin (e.g., "My Awesome Coin")
+</ParamField>
+
+<ParamField body="symbol" type="string" required>
+  The ticker symbol for the coin (e.g., "MAC")
+</ParamField>
+
+<ParamField body="description" type="string" required>
+  A description of the coin and its purpose
+</ParamField>
+
+<ParamField body="twitter" type="string">
+  Twitter handle associated with the coin (optional)
+</ParamField>
+
+<ParamField body="telegram" type="string">
+  Telegram link associated with the coin (optional)
+</ParamField>
+
+<ParamField body="website" type="string">
+  Website URL associated with the coin (optional)
+</ParamField>
+
+<ParamField body="file" type="string">
+  Base64 encoded image file for the coin's logo (optional)
+</ParamField>
+
+<ParamField body="showName" type="boolean">
+  Whether to display the creator's name publicly (default: true)
+</ParamField>
+
+## Response
+
+<ResponseField name="mint" type="string">
+  The newly created Solana mint address for the coin
+</ResponseField>
+
+<ResponseField name="metadata_uri" type="string">
+  The URI pointing to the coin's metadata JSON
+</ResponseField>
+
+<ResponseField name="bonding_curve" type="string">
+  The address of the bonding curve contract for this coin
+</ResponseField>
+
+<ResponseField name="associated_bonding_curve" type="string">
+  The associated bonding curve token account
+</ResponseField>
+
+<ResponseField name="signature" type="string">
+  The transaction signature for the coin creation
+</ResponseField>
+
+## Code Examples
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/coins/create" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "My Awesome Coin",
+    "symbol": "MAC",
+    "description": "A revolutionary new token on Pump.fun",
+    "twitter": "@myawesomecoin",
+    "telegram": "https://t.me/myawesomecoin",
+    "website": "https://myawesomecoin.com",
+    "showName": true
+  }'
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/coins/create"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "name": "My Awesome Coin",
+    "symbol": "MAC",
+    "description": "A revolutionary new token on Pump.fun",
+    "twitter": "@myawesomecoin",
+    "telegram": "https://t.me/myawesomecoin",
+    "website": "https://myawesomecoin.com",
+    "showName": True
+}
+
+response = requests.post(url, headers=headers, json=data)
+print(response.json())
+```
+
+```javascript JavaScript
+const axios = require('axios');
+
+const url = 'https://frontend-api-v3.pump.fun/coins/create';
+const headers = {
+  'Authorization': 'Bearer <your_token>',
+  'Accept': 'application/json',
+  'Content-Type': 'application/json'
+};
+
+const data = {
+  name: 'My Awesome Coin',
+  symbol: 'MAC',
+  description: 'A revolutionary new token on Pump.fun',
+  twitter: '@myawesomecoin',
+  telegram: 'https://t.me/myawesomecoin',
+  website: 'https://myawesomecoin.com',
+  showName: true
+};
+
+axios.post(url, data, { headers })
+  .then(response => console.log(response.data))
+  .catch(error => console.error(error));
+```
+
+</CodeGroup>
+
+## Response Example
+
+```json
+{
+  "mint": "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr",
+  "metadata_uri": "https://cf-ipfs.com/ipfs/QmXxX...",
+  "bonding_curve": "8mRW9kPq3LnY5tHgF2vX9cB7wU6rS4jK3mN8oP1qR2s",
+  "associated_bonding_curve": "9nXY8lMp4KoH6sGfD3wA0dC9xV7tU5kL4nO9qS2rT3u",
+  "signature": "5wZ8..."
+}
+```
+
+## Important Notes
+
+<Warning>
+**Before Creating a Coin:**
+
+1. Ensure you have sufficient SOL in your wallet for transaction fees
+2. Verify all information is correct as coin metadata cannot be easily changed after creation
+3. Make sure your image meets the platform's requirements (if uploading)
+4. Review Pump.fun's terms of service and content guidelines
+</Warning>
+
+### Image Requirements
+
+If including a `file` parameter:
+- Image must be base64 encoded
+- Supported formats: PNG, JPG, GIF
+- Recommended size: 512x512 pixels or larger
+- Maximum file size: 2MB
+
+### Social Links
+
+When providing social media links:
+- Twitter: Use format `@username` or `https://twitter.com/username`
+- Telegram: Use full URL `https://t.me/groupname`
+- Website: Must be a valid HTTPS URL
+
+### Bonding Curve
+
+When you create a coin:
+- It automatically creates a bonding curve for price discovery
+- Initial liquidity is managed by the bonding curve
+- The coin "graduates" to Raydium when the bonding curve completes
+
+## Related Endpoints
+
+- [Get Coin](/api-reference/coins/get-coin) - Retrieve your newly created coin's data
+- [Sign Create Transaction](/api-reference/coins/sign-create-tx) - Sign a coin creation transaction
+- [Get Metadata](/api-reference/coins/metadata) - View coin metadata
+
+## Additional Resources
+
+- [Pump.fun Creator Guide](/) - Best practices for launching coins
+- [Understanding Bonding Curves](/) - How pricing works on Pump.fun
+- [Marketing Your Coin](/) - Tips for successful launches

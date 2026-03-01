@@ -1,0 +1,206 @@
+---
+title: 'Following'
+description: 'Manage user following relationships'
+icon: 'user-plus'
+---
+
+## Follow User
+
+<ParamField path="method" type="string">
+  POST
+</ParamField>
+
+<ParamField path="endpoint" type="string">
+  /following/{userId}
+</ParamField>
+
+Follows a specified user.
+
+### Authentication
+
+Requires JWT authentication via `Authorization: Bearer <token>` header.
+
+### Path Parameters
+
+<ParamField path="userId" type="string" required>
+  The unique identifier of the user to follow
+</ParamField>
+
+### Query Parameters
+
+<ParamField query="captchaToken" type="string" required>
+  CAPTCHA token for verification
+</ParamField>
+
+### Response
+
+<ResponseField name="201" type="object">
+  Created - User followed successfully
+</ResponseField>
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/following/<userId>?captchaToken=<captchaToken>" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/following/<userId>?captchaToken=<captchaToken>"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.post(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+fetch('https://frontend-api-v3.pump.fun/following/<userId>?captchaToken=<captchaToken>', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer <your_token>',
+    'Accept': 'application/json'
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data));
+```
+</CodeGroup>
+
+---
+
+## Unfollow User
+
+<ParamField path="method" type="string">
+  DELETE
+</ParamField>
+
+<ParamField path="endpoint" type="string">
+  /following/{userId}
+</ParamField>
+
+Unfollows a specified user.
+
+### Authentication
+
+Requires JWT authentication via `Authorization: Bearer <token>` header.
+
+### Path Parameters
+
+<ParamField path="userId" type="string" required>
+  The unique identifier of the user to unfollow
+</ParamField>
+
+### Response
+
+<ResponseField name="200" type="object">
+  Success - User unfollowed successfully
+</ResponseField>
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE "https://frontend-api-v3.pump.fun/following/<userId>" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/following/<userId>"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.delete(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+fetch('https://frontend-api-v3.pump.fun/following/<userId>', {
+  method: 'DELETE',
+  headers: {
+    'Authorization': 'Bearer <your_token>',
+    'Accept': 'application/json'
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data));
+```
+</CodeGroup>
+
+---
+
+## Get Following
+
+<ParamField path="method" type="string">
+  GET
+</ParamField>
+
+<ParamField path="endpoint" type="string">
+  /following/{userId}
+</ParamField>
+
+Retrieves the list of users that a specified user is following.
+
+### Authentication
+
+Requires JWT authentication via `Authorization: Bearer <token>` header.
+
+### Path Parameters
+
+<ParamField path="userId" type="string" required>
+  The unique identifier of the user
+</ParamField>
+
+### Response
+
+<ResponseField name="200" type="object">
+  Success - Returns list of following relationships
+  <Expandable title="response">
+    <ResponseField name="following" type="array">
+      Array of user objects that are being followed
+    </ResponseField>
+    <ResponseField name="count" type="number">
+      Total number of users being followed
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/following/<userId>" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/following/<userId>"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+fetch('https://frontend-api-v3.pump.fun/following/<userId>', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer <your_token>',
+    'Accept': 'application/json'
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data));
+```
+</CodeGroup>

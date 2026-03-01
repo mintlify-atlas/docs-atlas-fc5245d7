@@ -1,0 +1,74 @@
+---
+title: 'Trades Overview'
+description: 'Track and retrieve trading activity on Pump.fun tokens'
+---
+
+## Introduction
+
+The Trades API provides comprehensive endpoints for tracking and retrieving trading activity on Pump.fun tokens. You can fetch trades for specific tokens, get the latest trade activity, count trades, and retrieve trades by transaction signatures.
+
+## Available Endpoints
+
+<CardGroup cols={2}>
+  <Card title="Get All Trades" icon="chart-line" href="/api-reference/trades/get-trades">
+    Retrieve all trades for a specific token with pagination and filtering
+  </Card>
+  <Card title="Latest Trade" icon="clock" href="/api-reference/trades/latest">
+    Get the most recent trade across all tokens
+  </Card>
+  <Card title="Trade Count" icon="hashtag" href="/api-reference/trades/get-trades#get-trade-count">
+    Get the total number of trades for a specific token
+  </Card>
+  <Card title="Trades by Signature" icon="signature" href="/api-reference/trades/by-signature">
+    Retrieve specific trades using transaction signatures
+  </Card>
+</CardGroup>
+
+## Authentication
+
+All Trades API endpoints require JWT authentication. Include your JWT token in the Authorization header:
+
+```bash
+Authorization: Bearer <your_jwt_token>
+```
+
+## Common Use Cases
+
+### Monitor Token Activity
+
+Use the trades endpoints to monitor buying and selling activity for specific tokens, helping you understand market sentiment and trading patterns.
+
+### Track Trade Volume
+
+Combine the trades count endpoint with the all trades endpoint to calculate trading volumes and analyze market activity over time.
+
+### Filter by Trade Size
+
+Use the `minimumSize` parameter to filter out small trades and focus on significant market movements.
+
+### Historical Analysis
+
+Retrieve historical trade data using pagination parameters to analyze price movements and trading patterns over time.
+
+<Note>
+  All endpoints require authentication via JWT token. Ensure you include the `Authorization: Bearer <token>` header with all requests.
+</Note>
+
+## Response Data
+
+Trade responses typically include:
+
+- Transaction signature
+- Token mint address
+- Trade size and direction (buy/sell)
+- Timestamp
+- User information
+- Price and amount data
+
+## Rate Limiting
+
+Be mindful of rate limits when making requests to the Trades API. Check response headers for rate limit information:
+
+- `x-ratelimit-limit` - Request limit
+- `x-ratelimit-remaining` - Remaining requests
+- `x-ratelimit-reset` - Reset time

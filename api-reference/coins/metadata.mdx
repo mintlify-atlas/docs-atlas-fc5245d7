@@ -1,0 +1,360 @@
+---
+title: 'Get Coin Metadata'
+api: 'GET https://advanced-api-v2.pump.fun/coins/metadata/{mint}'
+description: 'Retrieve metadata for one or more coins'
+---
+
+## Single Coin Metadata
+
+### Endpoint
+
+```
+GET https://advanced-api-v2.pump.fun/coins/metadata/{mint}
+```
+
+### Authentication
+
+<Note>
+This endpoint requires JWT authentication. Include your token in the Authorization header.
+</Note>
+
+```bash
+Authorization: Bearer <your_token>
+```
+
+### Path Parameters
+
+<ParamField path="mint" type="string" required>
+  The Solana mint address of the coin
+</ParamField>
+
+### Response
+
+<ResponseField name="metadata" type="object">
+  Metadata object for the coin
+  
+  <Expandable title="Metadata Properties">
+    <ResponseField name="name" type="string">
+      The name of the coin
+    </ResponseField>
+    
+    <ResponseField name="symbol" type="string">
+      The ticker symbol
+    </ResponseField>
+    
+    <ResponseField name="description" type="string">
+      Description of the coin
+    </ResponseField>
+    
+    <ResponseField name="image" type="string">
+      URL to the coin's image
+    </ResponseField>
+    
+    <ResponseField name="showName" type="boolean">
+      Whether to display the creator's name
+    </ResponseField>
+    
+    <ResponseField name="createdOn" type="string">
+      Platform where the coin was created (e.g., "https://pump.fun")
+    </ResponseField>
+    
+    <ResponseField name="twitter" type="string">
+      Twitter handle or URL
+    </ResponseField>
+    
+    <ResponseField name="telegram" type="string">
+      Telegram link
+    </ResponseField>
+    
+    <ResponseField name="website" type="string">
+      Website URL
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Code Examples
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://advanced-api-v2.pump.fun/coins/metadata/7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://advanced-api-v2.pump.fun/coins/metadata/7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+const axios = require('axios');
+
+const mint = '7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr';
+const url = `https://advanced-api-v2.pump.fun/coins/metadata/${mint}`;
+const headers = {
+  'Authorization': 'Bearer <your_token>',
+  'Accept': 'application/json'
+};
+
+axios.get(url, { headers })
+  .then(response => console.log(response.data))
+  .catch(error => console.error(error));
+```
+
+</CodeGroup>
+
+### Response Example
+
+```json
+{
+  "metadata": {
+    "name": "Example Coin",
+    "symbol": "EXAMPLE",
+    "description": "An example coin on Pump.fun",
+    "image": "https://cf-ipfs.com/ipfs/QmXxX...",
+    "showName": true,
+    "createdOn": "https://pump.fun",
+    "twitter": "@example",
+    "telegram": "https://t.me/example",
+    "website": "https://example.com"
+  }
+}
+```
+
+---
+
+## Bulk Metadata Retrieval
+
+### Endpoint
+
+```
+POST https://advanced-api-v2.pump.fun/coins/metadatas
+```
+
+### Authentication
+
+<Note>
+This endpoint requires JWT authentication. Include your token in the Authorization header.
+</Note>
+
+```bash
+Authorization: Bearer <your_token>
+```
+
+### Request Body
+
+<ParamField body="mints" type="array" required>
+  Array of Solana mint addresses to retrieve metadata for
+</ParamField>
+
+### Response
+
+<ResponseField name="data" type="array">
+  Array of metadata objects, one for each mint address provided
+  
+  <Expandable title="Metadata Object">
+    <ResponseField name="mint" type="string">
+      The Solana mint address
+    </ResponseField>
+    
+    <ResponseField name="name" type="string">
+      The name of the coin
+    </ResponseField>
+    
+    <ResponseField name="symbol" type="string">
+      The ticker symbol
+    </ResponseField>
+    
+    <ResponseField name="description" type="string">
+      Description of the coin
+    </ResponseField>
+    
+    <ResponseField name="image" type="string">
+      URL to the coin's image
+    </ResponseField>
+    
+    <ResponseField name="twitter" type="string">
+      Twitter handle or URL
+    </ResponseField>
+    
+    <ResponseField name="telegram" type="string">
+      Telegram link
+    </ResponseField>
+    
+    <ResponseField name="website" type="string">
+      Website URL
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Code Examples
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://advanced-api-v2.pump.fun/coins/metadatas" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mints": [
+      "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr",
+      "8kJ9Lm3Nh4Pg5Qr6St7Uv8Wx9Yz0Ab1Cd2Ef3Gh4Ij5Kl"
+    ]
+  }'
+```
+
+```python Python
+import requests
+
+url = "https://advanced-api-v2.pump.fun/coins/metadatas"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "mints": [
+        "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr",
+        "8kJ9Lm3Nh4Pg5Qr6St7Uv8Wx9Yz0Ab1Cd2Ef3Gh4Ij5Kl"
+    ]
+}
+
+response = requests.post(url, headers=headers, json=data)
+print(response.json())
+```
+
+```javascript JavaScript
+const axios = require('axios');
+
+const url = 'https://advanced-api-v2.pump.fun/coins/metadatas';
+const headers = {
+  'Authorization': 'Bearer <your_token>',
+  'Accept': 'application/json',
+  'Content-Type': 'application/json'
+};
+
+const data = {
+  mints: [
+    '7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr',
+    '8kJ9Lm3Nh4Pg5Qr6St7Uv8Wx9Yz0Ab1Cd2Ef3Gh4Ij5Kl'
+  ]
+};
+
+axios.post(url, data, { headers })
+  .then(response => console.log(response.data))
+  .catch(error => console.error(error));
+```
+
+</CodeGroup>
+
+### Response Example
+
+```json
+{
+  "data": [
+    {
+      "mint": "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr",
+      "name": "Example Coin",
+      "symbol": "EXAMPLE",
+      "description": "An example coin on Pump.fun",
+      "image": "https://cf-ipfs.com/ipfs/QmXxX...",
+      "twitter": "@example",
+      "telegram": "https://t.me/example",
+      "website": "https://example.com"
+    },
+    {
+      "mint": "8kJ9Lm3Nh4Pg5Qr6St7Uv8Wx9Yz0Ab1Cd2Ef3Gh4Ij5Kl",
+      "name": "Another Coin",
+      "symbol": "ANOTHER",
+      "description": "Another example coin",
+      "image": "https://cf-ipfs.com/ipfs/QmYyY...",
+      "twitter": "@another",
+      "telegram": "https://t.me/another",
+      "website": "https://another.com"
+    }
+  ]
+}
+```
+
+---
+
+## Bulk Coins by Mints
+
+For retrieving full coin data (not just metadata) for multiple mints:
+
+### Endpoint
+
+```
+POST https://advanced-api-v2.pump.fun/coins/mints
+```
+
+### Request Body
+
+<ParamField body="mints" type="array" required>
+  Array of Solana mint addresses
+</ParamField>
+
+### Code Example
+
+```bash cURL
+curl -X POST "https://advanced-api-v2.pump.fun/coins/mints" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{"mints": ["7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr"]}'
+```
+
+<Note>
+This endpoint returns full coin objects including market data, not just metadata.
+</Note>
+
+---
+
+## Use Cases
+
+### Single Coin Metadata
+
+Use the GET endpoint when:
+- You need metadata for a single coin
+- You want to display coin information without market data
+- You're building a coin detail page
+
+### Bulk Metadata
+
+Use the POST `/metadatas` endpoint when:
+- You need metadata for multiple coins at once
+- You're building a portfolio view
+- You want to display coin information for a list of mints
+- You need to optimize API calls (fewer requests)
+
+### Full Coin Data
+
+Use the POST `/mints` endpoint when:
+- You need complete coin data including market metrics
+- You're building a trading interface
+- You need pricing and liquidity information
+
+## Notes
+
+- Metadata is stored on IPFS and cached by Pump.fun servers
+- The single coin endpoint is useful for quick metadata lookups
+- Bulk endpoints are more efficient when dealing with multiple coins
+- Replace `<your_token>` with your actual JWT token
+- Bulk requests should be limited to reasonable batch sizes (recommend max 50 mints per request)
+
+## Related Endpoints
+
+- [Get Coin](/api-reference/coins/get-coin) - Get full coin details including market data
+- [List Coins](/api-reference/coins/list-coins) - Browse coins
+- [Search Coins](/api-reference/coins/search) - Search for coins

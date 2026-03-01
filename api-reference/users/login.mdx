@@ -1,0 +1,349 @@
+---
+title: 'Login & Logout'
+description: 'Authenticate users and manage sessions'
+---
+
+## Login
+
+<api method="POST" endpoint="https://frontend-api-v3.pump.fun/auth/login" />
+
+Authenticate a user and obtain a JWT token for accessing protected endpoints.
+
+### Authentication
+
+Requires JWT authentication via `Authorization: Bearer <token>` header.
+
+### Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for authentication
+  
+  ```
+  Authorization: Bearer <your_jwt_token>
+  ```
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  Request content type
+  
+  ```
+  Content-Type: application/json
+  ```
+</ParamField>
+
+<ParamField header="Accept" type="string" required>
+  Response content type
+  
+  ```
+  Accept: application/json
+  ```
+</ParamField>
+
+<ParamField header="Origin" type="string" required>
+  Request origin
+  
+  ```
+  Origin: https://pump.fun
+  ```
+</ParamField>
+
+### Request Body
+
+<ParamField body="wallet" type="string" required>
+  User's wallet address for authentication
+</ParamField>
+
+<ParamField body="signature" type="string" required>
+  Cryptographic signature proving wallet ownership
+</ParamField>
+
+<ParamField body="message" type="string" required>
+  The message that was signed by the wallet
+</ParamField>
+
+### Response
+
+<ResponseField name="201" type="object">
+  Successfully authenticated
+</ResponseField>
+
+### Response Schema
+
+<ResponseField name="token" type="string">
+  JWT authentication token for subsequent API requests
+</ResponseField>
+
+<ResponseField name="expiresIn" type="number">
+  Token expiration time in seconds
+</ResponseField>
+
+<ResponseField name="user" type="object">
+  Authenticated user information
+  
+  <ResponseField name="id" type="string">
+    User's unique identifier
+  </ResponseField>
+  
+  <ResponseField name="wallet" type="string">
+    User's wallet address
+  </ResponseField>
+  
+  <ResponseField name="username" type="string">
+    User's display name
+  </ResponseField>
+</ResponseField>
+
+### Example Usage
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/auth/login" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -H "Origin: https://pump.fun" \
+  -d '{
+    "wallet": "<wallet_address>",
+    "signature": "<signature>",
+    "message": "<signed_message>"
+  }'
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/auth/login"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Origin": "https://pump.fun"
+}
+
+data = {
+    "wallet": "<wallet_address>",
+    "signature": "<signature>",
+    "message": "<signed_message>"
+}
+
+response = requests.post(url, headers=headers, json=data)
+print(response.json())
+```
+
+```javascript JavaScript
+const url = "https://frontend-api-v3.pump.fun/auth/login";
+
+const response = await fetch(url, {
+  method: "POST",
+  headers: {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Origin": "https://pump.fun"
+  },
+  body: JSON.stringify({
+    wallet: "<wallet_address>",
+    signature: "<signature>",
+    message: "<signed_message>"
+  })
+});
+
+const data = await response.json();
+console.log(data);
+```
+
+```typescript TypeScript
+interface LoginRequest {
+  wallet: string;
+  signature: string;
+  message: string;
+}
+
+interface LoginResponse {
+  token: string;
+  expiresIn: number;
+  user: {
+    id: string;
+    wallet: string;
+    username: string;
+  };
+}
+
+const url = "https://frontend-api-v3.pump.fun/auth/login";
+
+const loginData: LoginRequest = {
+  wallet: "<wallet_address>",
+  signature: "<signature>",
+  message: "<signed_message>"
+};
+
+const response = await fetch(url, {
+  method: "POST",
+  headers: {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Origin": "https://pump.fun"
+  },
+  body: JSON.stringify(loginData)
+});
+
+const result: LoginResponse = await response.json();
+console.log(result);
+```
+
+</CodeGroup>
+
+### Error Responses
+
+<ResponseField name="400" type="object">
+  Bad Request - Invalid credentials or malformed request
+  
+  ```json
+  {
+    "statusCode": 400,
+    "message": "Invalid signature or wallet address"
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="401" type="object">
+  Unauthorized - Authentication failed
+  
+  ```json
+  {
+    "statusCode": 401,
+    "message": "Invalid credentials"
+  }
+  ```
+</ResponseField>
+
+<Warning>
+  Store the JWT token securely. Never expose it in client-side code or commit it to version control.
+</Warning>
+
+---
+
+## Logout
+
+<api method="POST" endpoint="https://frontend-api-v3.pump.fun/auth/logout" />
+
+Invalidate the current user session and JWT token.
+
+### Authentication
+
+Requires JWT authentication via `Authorization: Bearer <token>` header.
+
+### Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token to invalidate
+  
+  ```
+  Authorization: Bearer <your_jwt_token>
+  ```
+</ParamField>
+
+<ParamField header="Accept" type="string" required>
+  Response content type
+  
+  ```
+  Accept: application/json
+  ```
+</ParamField>
+
+<ParamField header="Origin" type="string" required>
+  Request origin
+  
+  ```
+  Origin: https://pump.fun
+  ```
+</ParamField>
+
+### Response
+
+<ResponseField name="201" type="object">
+  Successfully logged out
+</ResponseField>
+
+### Example Usage
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/auth/logout" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json" \
+  -H "Origin: https://pump.fun"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/auth/logout"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Origin": "https://pump.fun"
+}
+
+response = requests.post(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+const url = "https://frontend-api-v3.pump.fun/auth/logout";
+
+const response = await fetch(url, {
+  method: "POST",
+  headers: {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Origin": "https://pump.fun"
+  }
+});
+
+const data = await response.json();
+console.log(data);
+```
+
+```typescript TypeScript
+const url = "https://frontend-api-v3.pump.fun/auth/logout";
+
+const response = await fetch(url, {
+  method: "POST",
+  headers: {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Origin": "https://pump.fun"
+  }
+});
+
+const result = await response.json();
+console.log(result);
+```
+
+</CodeGroup>
+
+### Best Practices
+
+- Always call the logout endpoint when the user explicitly logs out
+- Clear the JWT token from local storage after logout
+- Handle logout on token expiration
+- Implement automatic logout after a period of inactivity
+
+## Authentication Flow
+
+1. **Request Message**: Request a message to sign from the platform
+2. **Sign Message**: User signs the message with their wallet
+3. **Login**: Submit wallet address, signature, and message to `/auth/login`
+4. **Receive Token**: Store the JWT token securely
+5. **Use Token**: Include token in `Authorization` header for all API requests
+6. **Logout**: Call `/auth/logout` to invalidate the session
+
+## Related Endpoints
+
+- [GET /auth/my-profile](/api-reference/users/get-profile) - Get current user profile
+- [POST /users/register](/api-reference/users/register) - Register new user
+- [GET /auth/is-valid-jurisdiction](/api-reference/users/permissions#jurisdiction-check) - Check jurisdiction validity

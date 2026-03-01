@@ -1,0 +1,95 @@
+---
+title: 'Coins Overview'
+description: 'Comprehensive guide to coin-related endpoints in the Pump.fun API'
+---
+
+The Coins API provides endpoints for retrieving, creating, and managing coins on the Pump.fun platform. These endpoints allow you to access coin data, search for coins, retrieve metadata, and create new coins.
+
+## Available Endpoints
+
+### Retrieval Endpoints
+
+<CardGroup cols={2}>
+  <Card title="Get Coin" icon="coins" href="/api-reference/coins/get-coin">
+    Retrieve detailed information about a specific coin by its mint address
+  </Card>
+  
+  <Card title="List Coins" icon="list" href="/api-reference/coins/list-coins">
+    Fetch a list of coins with various filtering and sorting options
+  </Card>
+  
+  <Card title="Search Coins" icon="magnifying-glass" href="/api-reference/coins/search">
+    Search for coins using keywords and advanced filters
+  </Card>
+  
+  <Card title="Get Metadata" icon="tag" href="/api-reference/coins/metadata">
+    Retrieve metadata for one or more coins
+  </Card>
+</CardGroup>
+
+### Creation Endpoints
+
+<CardGroup cols={2}>
+  <Card title="Create Coin" icon="plus" href="/api-reference/coins/create-coin">
+    Create a new coin on the Pump.fun platform
+  </Card>
+</CardGroup>
+
+## Common Parameters
+
+Many coin endpoints share common parameters:
+
+- **mint**: The Solana mint address of the coin (string)
+- **limit**: Maximum number of results to return (number)
+- **offset**: Number of results to skip for pagination (number)
+- **includeNsfw**: Whether to include NSFW content (boolean)
+- **sort**: Field to sort results by (string)
+- **order**: Sort order - "asc" or "desc" (string)
+
+## Authentication
+
+<Note>
+All Coins API endpoints require JWT authentication. Include your token in the Authorization header:
+
+```
+Authorization: Bearer <your_token>
+```
+</Note>
+
+## API Versions
+
+Pump.fun provides two API versions for coin endpoints:
+
+- **Frontend API v3**: `https://frontend-api-v3.pump.fun`
+  - Primary API for most coin operations
+  - Includes search, retrieval, and creation endpoints
+
+- **Advanced API v2**: `https://advanced-api-v2.pump.fun`
+  - Specialized endpoints for metadata and bulk operations
+  - Optimized for advanced use cases
+
+## Response Format
+
+All endpoints return JSON responses with appropriate HTTP status codes:
+
+- **200**: Successful GET request
+- **201**: Successful POST request (resource created)
+- **400**: Bad request (invalid parameters)
+- **401**: Unauthorized (invalid or missing token)
+- **404**: Resource not found
+
+## Rate Limiting
+
+<Warning>
+API requests are subject to rate limiting. Ensure your application handles rate limit responses appropriately.
+</Warning>
+
+## Next Steps
+
+Explore the individual endpoint documentation pages to learn more about specific operations:
+
+- [Get Coin](/api-reference/coins/get-coin) - Retrieve a single coin's details
+- [List Coins](/api-reference/coins/list-coins) - Browse available coins
+- [Create Coin](/api-reference/coins/create-coin) - Launch a new coin
+- [Search](/api-reference/coins/search) - Find coins by criteria
+- [Metadata](/api-reference/coins/metadata) - Access coin metadata

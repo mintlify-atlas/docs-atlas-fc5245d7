@@ -1,0 +1,54 @@
+---
+title: 'Analytics Overview'
+description: 'Advanced analytics endpoints for comprehensive coin data analysis'
+icon: 'chart-line'
+---
+
+The Analytics API provides advanced endpoints for retrieving comprehensive coin data, including lists, graduated coins, KOL-tracked coins, and holder analysis.
+
+## Available Endpoints
+
+<CardGroup cols={2}>
+  <Card title="Coins List" icon="list" href="/api-reference/analytics/coins-list">
+    Retrieve a list of coins with advanced filtering
+  </Card>
+  
+  <Card title="Graduated Coins" icon="graduation-cap" href="/api-reference/analytics/graduated-coins">
+    Get coins that have graduated to Raydium
+  </Card>
+  
+  <Card title="KOL Scan" icon="eye" href="/api-reference/analytics/kolscan">
+    Track coins monitored by key opinion leaders
+  </Card>
+  
+  <Card title="Top Holders" icon="users" href="/api-reference/analytics/top-holders">
+    Analyze top holders and SOL balances for any coin
+  </Card>
+</CardGroup>
+
+## Authentication
+
+All Analytics endpoints require JWT authentication via the `Authorization` header:
+
+```bash
+Authorization: Bearer <your_token>
+```
+
+## Base URL
+
+```
+https://advanced-api-v2.pump.fun
+```
+
+## Common Response Format
+
+All endpoints return JSON responses with appropriate HTTP status codes:
+
+- `200` - Successful request
+- `401` - Unauthorized (invalid or missing token)
+- `404` - Resource not found
+- `500` - Server error
+
+## Rate Limiting
+
+Please be mindful of rate limits when making requests to the Analytics API. Contact support for information on rate limit tiers and enterprise options.

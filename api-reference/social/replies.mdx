@@ -1,0 +1,275 @@
+---
+title: 'Replies'
+description: 'Manage replies and comments on coins and other content'
+icon: 'comment'
+---
+
+## Create Reply
+
+<ParamField path="method" type="string">
+  POST
+</ParamField>
+
+<ParamField path="endpoint" type="string">
+  /replies
+</ParamField>
+
+Creates a new reply or comment.
+
+### Authentication
+
+Requires JWT authentication via `Authorization: Bearer <token>` header.
+
+### Request Body
+
+<ParamField body="text" type="string" required>
+  The content of the reply
+</ParamField>
+
+<ParamField body="mint" type="string" required>
+  The mint address of the coin being replied to
+</ParamField>
+
+<ParamField body="parentId" type="string">
+  Optional parent reply ID for nested replies
+</ParamField>
+
+<ParamField body="image" type="string">
+  Optional image URL or data to attach to the reply
+</ParamField>
+
+### Response
+
+<ResponseField name="201" type="object">
+  Created - Returns the newly created reply
+  <Expandable title="response">
+    <ResponseField name="id" type="string">
+      Unique identifier of the reply
+    </ResponseField>
+    <ResponseField name="text" type="string">
+      Content of the reply
+    </ResponseField>
+    <ResponseField name="createdAt" type="string">
+      Timestamp when the reply was created
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/replies" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Great project!",
+    "mint": "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr"
+  }'
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/replies"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "text": "Great project!",
+    "mint": "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr"
+}
+
+response = requests.post(url, headers=headers, json=data)
+print(response.json())
+```
+
+```javascript JavaScript
+fetch('https://frontend-api-v3.pump.fun/replies', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer <your_token>',
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    text: 'Great project!',
+    mint: '7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr'
+  })
+})
+.then(response => response.json())
+.then(data => console.log(data));
+```
+</CodeGroup>
+
+---
+
+## Get Replies by Mint
+
+<ParamField path="method" type="string">
+  GET
+</ParamField>
+
+<ParamField path="endpoint" type="string">
+  /replies/{mint}
+</ParamField>
+
+Retrieves all replies for a specific coin mint address.
+
+### Authentication
+
+Requires JWT authentication via `Authorization: Bearer <token>` header.
+
+### Path Parameters
+
+<ParamField path="mint" type="string" required>
+  The mint address of the coin
+</ParamField>
+
+### Query Parameters
+
+<ParamField query="limit" type="number" required>
+  Maximum number of replies to return
+</ParamField>
+
+<ParamField query="offset" type="number" required>
+  Number of replies to skip (for pagination)
+</ParamField>
+
+<ParamField query="user" type="string" required>
+  Filter replies by user address
+</ParamField>
+
+<ParamField query="reverseOrder" type="boolean" required>
+  If true, returns replies in reverse chronological order
+</ParamField>
+
+### Response
+
+<ResponseField name="200" type="object">
+  Success - Returns list of replies
+  <Expandable title="response">
+    <ResponseField name="replies" type="array">
+      Array of reply objects
+    </ResponseField>
+    <ResponseField name="total" type="number">
+      Total number of replies
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/replies/<mint>?limit=50&offset=0&user=<user_address>&reverseOrder=false" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/replies/<mint>?limit=50&offset=0&user=<user_address>&reverseOrder=false"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+fetch('https://frontend-api-v3.pump.fun/replies/<mint>?limit=50&offset=0&user=<user_address>&reverseOrder=false', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer <your_token>',
+    'Accept': 'application/json'
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data));
+```
+</CodeGroup>
+
+---
+
+## Get User Replies
+
+<ParamField path="method" type="string">
+  GET
+</ParamField>
+
+<ParamField path="endpoint" type="string">
+  /replies/user-replies/{address}
+</ParamField>
+
+Retrieves all replies made by a specific user.
+
+### Authentication
+
+Requires JWT authentication via `Authorization: Bearer <token>` header.
+
+### Path Parameters
+
+<ParamField path="address" type="string" required>
+  The wallet address of the user
+</ParamField>
+
+### Query Parameters
+
+<ParamField query="limit" type="number" required>
+  Maximum number of replies to return
+</ParamField>
+
+<ParamField query="offset" type="number" required>
+  Number of replies to skip (for pagination)
+</ParamField>
+
+### Response
+
+<ResponseField name="200" type="object">
+  Success - Returns list of user's replies
+  <Expandable title="response">
+    <ResponseField name="replies" type="array">
+      Array of reply objects created by the user
+    </ResponseField>
+    <ResponseField name="total" type="number">
+      Total number of replies by the user
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/replies/user-replies/<address>?limit=50&offset=0" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/replies/user-replies/<address>?limit=50&offset=0"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+fetch('https://frontend-api-v3.pump.fun/replies/user-replies/<address>?limit=50&offset=0', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer <your_token>',
+    'Accept': 'application/json'
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data));
+```
+</CodeGroup>

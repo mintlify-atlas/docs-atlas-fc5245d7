@@ -1,0 +1,278 @@
+---
+title: 'Bookmarks'
+description: 'Manage user bookmarks for coins and content'
+icon: 'bookmark'
+---
+
+## Get All Bookmarks
+
+<ParamField path="method" type="string">
+  GET
+</ParamField>
+
+<ParamField path="endpoint" type="string">
+  /bookmarks
+</ParamField>
+
+Retrieves all bookmarks for the authenticated user.
+
+### Authentication
+
+Requires JWT authentication via `Authorization: Bearer <token>` header.
+
+### Query Parameters
+
+<ParamField query="withPreviewImages" type="boolean" required>
+  Include preview images in the response
+</ParamField>
+
+### Response
+
+<ResponseField name="200" type="object">
+  Success - Returns list of bookmarks
+</ResponseField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/bookmarks?withPreviewImages=true" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/bookmarks?withPreviewImages=true"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+fetch('https://frontend-api-v3.pump.fun/bookmarks?withPreviewImages=true', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer <your_token>',
+    'Accept': 'application/json'
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data));
+```
+</CodeGroup>
+
+---
+
+## Create Bookmark
+
+<ParamField path="method" type="string">
+  POST
+</ParamField>
+
+<ParamField path="endpoint" type="string">
+  /bookmarks
+</ParamField>
+
+Creates a new bookmark for the authenticated user.
+
+### Authentication
+
+Requires JWT authentication via `Authorization: Bearer <token>` header.
+
+### Request Body
+
+<ParamField body="name" type="string">
+  Name of the bookmark
+</ParamField>
+
+<ParamField body="description" type="string">
+  Description of the bookmark
+</ParamField>
+
+### Response
+
+<ResponseField name="201" type="object">
+  Created - Returns the newly created bookmark
+</ResponseField>
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/bookmarks" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "My Bookmark", "description": "Favorite coins"}'
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/bookmarks"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "name": "My Bookmark",
+    "description": "Favorite coins"
+}
+
+response = requests.post(url, headers=headers, json=data)
+print(response.json())
+```
+
+```javascript JavaScript
+fetch('https://frontend-api-v3.pump.fun/bookmarks', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer <your_token>',
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    name: 'My Bookmark',
+    description: 'Favorite coins'
+  })
+})
+.then(response => response.json())
+.then(data => console.log(data));
+```
+</CodeGroup>
+
+---
+
+## Get Bookmark by ID
+
+<ParamField path="method" type="string">
+  GET
+</ParamField>
+
+<ParamField path="endpoint" type="string">
+  /bookmarks/{bookmarkId}
+</ParamField>
+
+Retrieves a specific bookmark by its ID.
+
+### Authentication
+
+Requires JWT authentication via `Authorization: Bearer <token>` header.
+
+### Path Parameters
+
+<ParamField path="bookmarkId" type="string" required>
+  The unique identifier of the bookmark
+</ParamField>
+
+### Query Parameters
+
+<ParamField query="withDetails" type="boolean" required>
+  Include detailed information in the response
+</ParamField>
+
+### Response
+
+<ResponseField name="200" type="object">
+  Success - Returns the bookmark details
+</ResponseField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/bookmarks/<bookmarkId>?withDetails=true" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/bookmarks/<bookmarkId>?withDetails=true"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+fetch('https://frontend-api-v3.pump.fun/bookmarks/<bookmarkId>?withDetails=true', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer <your_token>',
+    'Accept': 'application/json'
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data));
+```
+</CodeGroup>
+
+---
+
+## Delete Bookmark
+
+<ParamField path="method" type="string">
+  DELETE
+</ParamField>
+
+<ParamField path="endpoint" type="string">
+  /bookmarks/{bookmarkId}
+</ParamField>
+
+Deletes a specific bookmark.
+
+### Authentication
+
+Requires JWT authentication via `Authorization: Bearer <token>` header.
+
+### Path Parameters
+
+<ParamField path="bookmarkId" type="string" required>
+  The unique identifier of the bookmark to delete
+</ParamField>
+
+### Response
+
+<ResponseField name="200" type="object">
+  Success - Bookmark deleted successfully
+</ResponseField>
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE "https://frontend-api-v3.pump.fun/bookmarks/<bookmarkId>" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/bookmarks/<bookmarkId>"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.delete(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+fetch('https://frontend-api-v3.pump.fun/bookmarks/<bookmarkId>', {
+  method: 'DELETE',
+  headers: {
+    'Authorization': 'Bearer <your_token>',
+    'Accept': 'application/json'
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data));
+```
+</CodeGroup>

@@ -1,0 +1,398 @@
+---
+title: "Content Filtering"
+description: "Control content visibility with NSFW marking, hiding, and bulk operations"
+---
+
+## Overview
+
+Content filtering endpoints provide granular control over what content is visible on the platform and how it's classified. These tools allow administrators to mark content as NSFW, hide content from feeds, delete inappropriate images, and perform bulk moderation operations.
+
+<Warning>
+  All content filtering operations require admin authentication and take effect immediately across the platform.
+</Warning>
+
+## Mark as NSFW
+
+Flag content as Not Safe For Work. NSFW content is typically hidden by default and requires user opt-in to view.
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/moderation/mark-as-nsfw/{mint}" \
+  -H "Authorization: Bearer <your_token>"
+```
+
+```python Python
+import requests
+
+mint = "DYw8jCTfwHNRJhhmFcbXvVDTqWMEVFBX6ZKUmG5CNSKK"
+url = f"https://frontend-api-v3.pump.fun/moderation/mark-as-nsfw/{mint}"
+headers = {"Authorization": "Bearer <your_token>"}
+
+response = requests.post(url, headers=headers)
+print(response.json())
+```
+</CodeGroup>
+
+<ParamField path="mint" type="string" required>
+  The mint address of the token to mark as NSFW
+</ParamField>
+
+**Response**
+
+Returns 201 status code on success. The content will be immediately flagged as NSFW and hidden from default feeds.
+
+## Mark as Hidden
+
+Completely hide content from public feeds and search results.
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/moderation/mark-as-hidden/{id}" \
+  -H "Authorization: Bearer <your_token>"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/moderation/mark-as-hidden/12345"
+headers = {"Authorization": "Bearer <your_token>"}
+
+response = requests.post(url, headers=headers)
+print(response.json())
+```
+</CodeGroup>
+
+<ParamField path="id" type="number" required>
+  The ID of the content to hide
+</ParamField>
+
+**Use Cases**
+
+- Severe policy violations
+- Content pending investigation
+- Temporarily remove content while reviewing reports
+
+## Mark as Ignored
+
+Mark a report as reviewed but requiring no action. This is useful for false reports or content that doesn't violate policies.
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/moderation/mark-as-ignored/{id}" \
+  -H "Authorization: Bearer <your_token>"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/moderation/mark-as-ignored/12345"
+headers = {"Authorization": "Bearer <your_token>"}
+
+response = requests.post(url, headers=headers)
+print(response.json())
+```
+</CodeGroup>
+
+<ParamField path="id" type="number" required>
+  The ID of the report to mark as ignored
+</ParamField>
+
+<Warning>
+  Ignored reports are still tracked in the system for audit purposes but won't appear in active report queues.
+</Warning>
+
+## Delete Photo
+
+Permanently remove an inappropriate image from a token.
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/moderation/delete-photo/{mint}" \
+  -H "Authorization: Bearer <your_token>"
+```
+
+```python Python
+import requests
+
+mint = "DYw8jCTfwHNRJhhmFcbXvVDTqWMEVFBX6ZKUmG5CNSKK"
+url = f"https://frontend-api-v3.pump.fun/moderation/delete-photo/{mint}"
+headers = {"Authorization": "Bearer <your_token>"}
+
+response = requests.post(url, headers=headers)
+print(response.json())
+```
+</CodeGroup>
+
+<ParamField path="mint" type="string" required>
+  The mint address of the token whose photo should be deleted
+</ParamField>
+
+<Warning>
+  This action is irreversible. The image will be permanently removed from the platform. Consider backing up evidence before deletion if needed for future reference.
+</Warning>
+
+## Bulk NSFW
+
+Mark multiple tokens as NSFW in a single operation.
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/moderation/bulk-nsfw" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mints": [
+      "mint1address",
+      "mint2address",
+      "mint3address"
+    ]
+  }'
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/moderation/bulk-nsfw"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "mints": [
+        "mint1address",
+        "mint2address",
+        "mint3address"
+    ]
+}
+
+response = requests.post(url, headers=headers, json=data)
+print(response.json())
+```
+</CodeGroup>
+
+**Request Body**
+
+<ParamField body="mints" type="array" required>
+  Array of mint addresses to mark as NSFW
+</ParamField>
+
+**Use Cases**
+
+- Processing multiple related reports
+- Content from same problematic creator
+- Batch moderation during platform cleanup
+
+## Bulk Hidden
+
+Hide multiple pieces of content in a single operation.
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/moderation/bulk-hidden" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ids": [123, 456, 789]
+  }'
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/moderation/bulk-hidden"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "ids": [123, 456, 789]
+}
+
+response = requests.post(url, headers=headers, json=data)
+print(response.json())
+```
+</CodeGroup>
+
+**Request Body**
+
+<ParamField body="ids" type="array" required>
+  Array of content IDs to hide
+</ParamField>
+
+## Bulk Ban
+
+Ban multiple users or pieces of content simultaneously.
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/moderation/bulk-ban" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "addresses": [
+      "address1",
+      "address2",
+      "address3"
+    ],
+    "reason": "Coordinated spam campaign"
+  }'
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/moderation/bulk-ban"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "addresses": [
+        "address1",
+        "address2",
+        "address3"
+    ],
+    "reason": "Coordinated spam campaign"
+}
+
+response = requests.post(url, headers=headers, json=data)
+print(response.json())
+```
+</CodeGroup>
+
+**Request Body**
+
+<ParamField body="addresses" type="array" required>
+  Array of wallet addresses to ban
+</ParamField>
+
+<ParamField body="reason" type="string">
+  Reason for the bulk ban (recommended for audit purposes)
+</ParamField>
+
+**Use Cases**
+
+- Shutting down coordinated spam rings
+- Banning multiple accounts from same bad actor
+- Emergency response to platform attacks
+
+## Moderation Logs
+
+Retrieve a history of all moderation actions for audit and review.
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/moderation/logs?offset=0&limit=50&moderator=" \
+  -H "Authorization: Bearer <your_token>"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/moderation/logs"
+headers = {"Authorization": "Bearer <your_token>"}
+
+params = {
+    "offset": 0,
+    "limit": 50,
+    "moderator": ""  # Optional: filter by specific moderator
+}
+
+response = requests.get(url, headers=headers, params=params)
+print(response.json())
+```
+</CodeGroup>
+
+**Query Parameters**
+
+<ParamField query="offset" type="number" required>
+  Number of records to skip for pagination
+</ParamField>
+
+<ParamField query="limit" type="number" required>
+  Maximum number of log entries to return
+</ParamField>
+
+<ParamField query="moderator" type="string" required>
+  Filter logs by moderator address (empty string for all moderators)
+</ParamField>
+
+**Response Fields**
+
+Log entries typically include:
+
+<ResponseField name="id" type="string">
+  Unique identifier for the log entry
+</ResponseField>
+
+<ResponseField name="action" type="string">
+  Type of moderation action taken (e.g., "mark_nsfw", "hide", "ban")
+</ResponseField>
+
+<ResponseField name="targetId" type="string">
+  ID or address of the affected content or user
+</ResponseField>
+
+<ResponseField name="moderator" type="string">
+  Address of the moderator who performed the action
+</ResponseField>
+
+<ResponseField name="timestamp" type="string">
+  When the action was performed (ISO 8601 format)
+</ResponseField>
+
+<ResponseField name="reason" type="string">
+  Reason provided for the action (if any)
+</ResponseField>
+
+## Content Filtering Strategy
+
+### When to Use NSFW
+
+- Adult content that's not explicitly prohibited
+- Provocative but not offensive imagery
+- Content that may be inappropriate in some contexts
+- Artistic nudity or mature themes
+
+### When to Hide
+
+- Clear policy violations
+- Scams and fraudulent content
+- Severe harassment or hate speech
+- Content pending legal review
+
+### When to Ban
+
+- Repeat offenders
+- Coordinated malicious activity
+- Severe terms of service violations
+- Criminal activity
+
+## Best Practices
+
+1. **Document actions**: Always provide reasons for moderation actions
+2. **Use appropriate severity**: Match the action to the severity of violation
+3. **Leverage bulk operations**: More efficient for related content
+4. **Review logs regularly**: Monitor patterns and moderator activity
+5. **Consistent standards**: Apply policies uniformly across all content
+6. **Escalation paths**: Have clear procedures for severe violations
+7. **Preserve evidence**: Screenshot or save data before deletion
+8. **Response time**: Prioritize reports by severity for quick action
+
+## Moderation Decision Matrix
+
+| Violation Type | First Offense | Second Offense | Severe/Repeat |
+|----------------|---------------|----------------|---------------|
+| NSFW content | Mark NSFW | Mark NSFW | Hide + Warn |
+| Spam | Hide | Hide + Warn | Ban |
+| Scam | Hide | Ban | Ban + Report |
+| Hate speech | Hide | Ban | Ban |
+| Copyright | Delete Photo | Hide | Ban |
+| Minor issues | Ignore | Mark NSFW | Hide |
+
+<Warning>
+  This matrix is a guideline. Always use judgment based on context, severity, and platform policies.
+</Warning>

@@ -1,0 +1,201 @@
+---
+title: 'Authentication'
+description: 'Learn how to authenticate with the Pump.fun API using JWT tokens'
+---
+
+## Overview
+
+The Pump.fun API uses JWT (JSON Web Token) authentication to secure endpoints and ensure authorized access. Most API endpoints require authentication, and it's recommended to include authentication with all requests to ensure complete data retrieval and avoid potential access issues.
+
+<Note>
+Always include your JWT token with API requests to access protected endpoints and retrieve complete data.
+</Note>
+
+## Authentication Methods
+
+### JWT Bearer Token
+
+All authenticated requests require a valid JWT token passed in the `Authorization` header:
+
+```bash
+Authorization: Bearer <your_jwt_token>
+```
+
+## Obtaining a JWT Token
+
+### Login Endpoint
+
+To obtain a JWT token, make a POST request to the login endpoint:
+
+<ParamField path="endpoint" type="string">
+  `POST https://frontend-api-v3.pump.fun/auth/login`
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/auth/login" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -H "Origin: https://pump.fun" \
+  -d '{"key": "value"}'
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/auth/login"
+headers = {
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Origin": "https://pump.fun"
+}
+
+data = {"key": "value"}
+
+response = requests.post(url, headers=headers, json=data)
+token = response.json().get("token")
+```
+
+```javascript JavaScript
+const response = await fetch('https://frontend-api-v3.pump.fun/auth/login', {
+  method: 'POST',
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+    'Origin': 'https://pump.fun'
+  },
+  body: JSON.stringify({key: 'value'})
+});
+
+const data = await response.json();
+const token = data.token;
+```
+</CodeGroup>
+
+### Response
+
+The login endpoint returns a JWT token in the response body. Store this token securely and include it in subsequent API requests.
+
+## Using Your Token
+
+Once you have obtained a JWT token, include it in the `Authorization` header of all API requests:
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/auth/my-profile" \
+  -H "Authorization: Bearer <your_jwt_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/auth/my-profile"
+headers = {
+    "Authorization": f"Bearer {token}",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, headers=headers)
+profile = response.json()
+```
+
+```javascript JavaScript
+const response = await fetch('https://frontend-api-v3.pump.fun/auth/my-profile', {
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Accept': 'application/json'
+  }
+});
+
+const profile = await response.json();
+```
+</CodeGroup>
+
+## Authentication Endpoints
+
+### Check Your Profile
+
+Verify your authentication status by retrieving your profile:
+
+<ParamField path="endpoint" type="string">
+  `GET https://frontend-api-v3.pump.fun/auth/my-profile`
+</ParamField>
+
+This endpoint requires authentication and returns your user profile information.
+
+### Check Admin Status
+
+Determine if your account has admin privileges:
+
+<ParamField path="endpoint" type="string">
+  `GET https://frontend-api-v3.pump.fun/auth/is-admin`
+</ParamField>
+
+### Check Super Admin Status
+
+Determine if your account has super admin privileges:
+
+<ParamField path="endpoint" type="string">
+  `GET https://frontend-api-v3.pump.fun/auth/is-super-admin`
+</ParamField>
+
+### Logout
+
+Invalidate your current JWT token:
+
+<ParamField path="endpoint" type="string">
+  `POST https://frontend-api-v3.pump.fun/auth/logout`
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/auth/logout" \
+  -H "Authorization: Bearer <your_jwt_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/auth/logout"
+headers = {
+    "Authorization": f"Bearer {token}",
+    "Accept": "application/json"
+}
+
+response = requests.post(url, headers=headers)
+```
+</CodeGroup>
+
+## Best Practices
+
+<Accordion title="Store tokens securely">
+  Never store JWT tokens in plain text or commit them to version control. Use environment variables or secure credential management systems.
+</Accordion>
+
+<Accordion title="Handle token expiration">
+  JWT tokens may expire after a certain period. Implement logic to detect expired tokens (401 Unauthorized responses) and re-authenticate when necessary.
+</Accordion>
+
+<Accordion title="Use HTTPS only">
+  Always use HTTPS when making API requests to protect your JWT token from interception.
+</Accordion>
+
+<Accordion title="Minimize token exposure">
+  Only send tokens to legitimate Pump.fun API endpoints. Never share your token with third parties.
+</Accordion>
+
+<Warning>
+If you believe your JWT token has been compromised, immediately call the logout endpoint and obtain a new token through the login process.
+</Warning>
+
+## Common Authentication Errors
+
+| Status Code | Error | Description |
+|-------------|-------|-------------|
+| `401` | Unauthorized | Missing or invalid JWT token |
+| `403` | Forbidden | Valid token but insufficient permissions |
+| `404` | Not Found | Endpoint does not exist |
+
+For more information on handling errors, see the [Error Handling](/essentials/error-handling) guide.

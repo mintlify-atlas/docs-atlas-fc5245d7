@@ -1,0 +1,136 @@
+---
+title: 'Get All Trades'
+api: 'GET https://frontend-api-v3.pump.fun/trades/all/{mint}'
+description: 'Retrieve all trades for a specific token with pagination and filtering options'
+---
+
+## Authentication
+
+This endpoint requires JWT authentication via the `Authorization: Bearer <token>` header.
+
+## Path Parameters
+
+<ParamField path="mint" type="string" required>
+  The token mint address to retrieve trades for
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="limit" type="number" required>
+  Maximum number of trades to return per request. Use this for pagination.
+</ParamField>
+
+<ParamField query="offset" type="number" required>
+  Number of trades to skip before starting to return results. Use with `limit` for pagination.
+</ParamField>
+
+<ParamField query="minimumSize" type="number" required>
+  Minimum trade size to filter results. Only trades equal to or larger than this value will be returned.
+</ParamField>
+
+## Response
+
+<ResponseField name="trades" type="array">
+  Array of trade objects for the specified token
+</ResponseField>
+
+## Example Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/trades/all/7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr?limit=50&offset=0&minimumSize=0.1" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/trades/all/7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr"
+params = {
+    "limit": 50,
+    "offset": 0,
+    "minimumSize": 0.1
+}
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, params=params, headers=headers)
+print(response.json())
+```
+
+</CodeGroup>
+
+<Note>
+  Replace `<your_token>` with your actual JWT token and use a valid token mint address.
+</Note>
+
+## Pagination
+
+To paginate through results:
+
+1. Start with `offset=0` and your desired `limit`
+2. For the next page, increment `offset` by the `limit` value
+3. Continue until fewer results than `limit` are returned
+
+Example pagination sequence:
+- Page 1: `offset=0&limit=50`
+- Page 2: `offset=50&limit=50`
+- Page 3: `offset=100&limit=50`
+
+---
+
+## Get Trade Count
+
+<api>GET https://frontend-api-v3.pump.fun/trades/count/{mint}</api>
+
+Get the total number of trades for a specific token.
+
+### Path Parameters
+
+<ParamField path="mint" type="string" required>
+  The token mint address to count trades for
+</ParamField>
+
+### Query Parameters
+
+<ParamField query="minimumSize" type="number" required>
+  Minimum trade size to filter the count. Only trades equal to or larger than this value will be counted.
+</ParamField>
+
+### Response
+
+<ResponseField name="count" type="number">
+  Total number of trades matching the criteria
+</ResponseField>
+
+### Example Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/trades/count/7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr?minimumSize=0.1" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/trades/count/7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr"
+params = {
+    "minimumSize": 0.1
+}
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, params=params, headers=headers)
+print(response.json())
+```
+
+</CodeGroup>

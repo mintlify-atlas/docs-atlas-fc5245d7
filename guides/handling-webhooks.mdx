@@ -1,0 +1,337 @@
+---
+title: Handling webhooks
+description: Learn how to receive and process livestream webhooks from Pump.fun
+---
+
+Pump.fun provides webhook endpoints for livestream events. This guide shows you how to handle webhook callbacks for LiveKit and other streaming services.
+
+## LiveKit webhooks
+
+LiveKit webhooks notify your application about livestream events such as room creation, participant joining/leaving, and recording status.
+
+### Webhook endpoint
+
+The LiveKit webhook endpoint is:
+
+```
+POST https://frontend-api-v3.pump.fun/livestreams/livekit-webhook
+```
+
+### Webhook authentication
+
+Webhooks require proper authentication via the `Authorization` header:
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/livestreams/livekit-webhook" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Content-Type: application/json" \
+  -d '{"event": "room_started", "room": "room123"}'
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/livestreams/livekit-webhook"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Content-Type": "application/json"
+}
+data = {
+    "event": "room_started",
+    "room": "room123"
+}
+
+response = requests.post(url, headers=headers, json=data)
+print(response.json())
+```
+</CodeGroup>
+
+<Warning>
+Webhooks require valid JWT authentication. Ensure your webhook handler includes proper authorization headers when forwarding events.
+</Warning>
+
+## Call webhooks
+
+The general call webhook endpoint handles various streaming events:
+
+```
+POST https://frontend-api-v3.pump.fun/livestreams/call-webhook
+```
+
+### Signature verification
+
+This endpoint uses signature-based authentication via the `x-signature` header:
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/livestreams/call-webhook" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "x-signature: <computed_signature>" \
+  -H "Content-Type: application/json" \
+  -d '{"event_type": "call.started", "call_id": "abc123"}'
+```
+
+```python Python
+import requests
+import hmac
+import hashlib
+
+def compute_signature(payload, secret):
+    """
+    Compute HMAC signature for webhook verification
+    """
+    return hmac.new(
+        secret.encode(),
+        payload.encode(),
+        hashlib.sha256
+    ).hexdigest()
+
+url = "https://frontend-api-v3.pump.fun/livestreams/call-webhook"
+payload = '{"event_type": "call.started", "call_id": "abc123"}'
+signature = compute_signature(payload, "your_webhook_secret")
+
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "x-signature": signature,
+    "Content-Type": "application/json"
+}
+
+response = requests.post(url, headers=headers, data=payload)
+print(response.json())
+```
+</CodeGroup>
+
+<Tip>
+Always verify webhook signatures to ensure requests are authentic and haven't been tampered with.
+</Tip>
+
+## Setting up a webhook receiver
+
+Create a webhook receiver server to handle incoming webhook events:
+
+```python Python
+from flask import Flask, request, jsonify
+import hmac
+import hashlib
+
+app = Flask(__name__)
+
+WEBHOOK_SECRET = "your_webhook_secret"
+
+def verify_signature(payload, signature):
+    """
+    Verify webhook signature
+    """
+    expected_signature = hmac.new(
+        WEBHOOK_SECRET.encode(),
+        payload.encode(),
+        hashlib.sha256
+    ).hexdigest()
+    return hmac.compare_digest(signature, expected_signature)
+
+@app.route('/webhooks/livekit', methods=['POST'])
+def handle_livekit_webhook():
+    """
+    Handle LiveKit webhook events
+    """
+    try:
+        # Get the signature from headers
+        signature = request.headers.get('x-signature', '')
+        payload = request.get_data(as_text=True)
+        
+        # Verify signature
+        if not verify_signature(payload, signature):
+            return jsonify({"error": "Invalid signature"}), 401
+        
+        # Parse webhook data
+        data = request.json
+        event_type = data.get('event')
+        
+        # Handle different event types
+        if event_type == 'room_started':
+            handle_room_started(data)
+        elif event_type == 'participant_joined':
+            handle_participant_joined(data)
+        elif event_type == 'participant_left':
+            handle_participant_left(data)
+        elif event_type == 'recording_started':
+            handle_recording_started(data)
+        else:
+            print(f"Unknown event type: {event_type}")
+        
+        return jsonify({"status": "success"}), 200
+        
+    except Exception as e:
+        print(f"Error handling webhook: {e}")
+        return jsonify({"error": str(e)}), 500
+
+def handle_room_started(data):
+    print(f"Room started: {data.get('room')}")
+    # Implement your logic here
+
+def handle_participant_joined(data):
+    print(f"Participant joined: {data.get('participant')}")
+    # Implement your logic here
+
+def handle_participant_left(data):
+    print(f"Participant left: {data.get('participant')}")
+    # Implement your logic here
+
+def handle_recording_started(data):
+    print(f"Recording started for room: {data.get('room')}")
+    # Implement your logic here
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080)
+```
+
+## Webhook event types
+
+Common webhook event types you might receive:
+
+<Accordion title="LiveKit events">
+  - `room_started` - A new room has been created
+  - `room_finished` - A room has ended
+  - `participant_joined` - A participant joined the room
+  - `participant_left` - A participant left the room
+  - `recording_started` - Recording started for a room
+  - `recording_finished` - Recording finished for a room
+  - `track_published` - A track was published
+  - `track_unpublished` - A track was unpublished
+</Accordion>
+
+<Accordion title="Call events">
+  - `call.started` - A call has started
+  - `call.ended` - A call has ended
+  - `call.participant_joined` - A participant joined
+  - `call.participant_left` - A participant left
+  - `call.recording_ready` - Recording is ready for download
+</Accordion>
+
+## Forwarding webhooks
+
+If you need to forward webhook events to Pump.fun from your streaming service:
+
+```python Python
+import requests
+import hmac
+import hashlib
+
+class WebhookForwarder:
+    def __init__(self, pump_fun_token, webhook_secret):
+        self.token = pump_fun_token
+        self.secret = webhook_secret
+        self.base_url = "https://frontend-api-v3.pump.fun"
+    
+    def forward_livekit_event(self, event_data):
+        """
+        Forward LiveKit event to Pump.fun
+        """
+        url = f"{self.base_url}/livestreams/livekit-webhook"
+        headers = {
+            "Authorization": f"Bearer {self.token}",
+            "Content-Type": "application/json"
+        }
+        
+        response = requests.post(url, headers=headers, json=event_data)
+        return response.json()
+    
+    def forward_call_event(self, event_data):
+        """
+        Forward call event to Pump.fun with signature
+        """
+        url = f"{self.base_url}/livestreams/call-webhook"
+        
+        # Convert data to string for signature
+        import json
+        payload = json.dumps(event_data)
+        
+        # Compute signature
+        signature = hmac.new(
+            self.secret.encode(),
+            payload.encode(),
+            hashlib.sha256
+        ).hexdigest()
+        
+        headers = {
+            "Authorization": f"Bearer {self.token}",
+            "x-signature": signature,
+            "Content-Type": "application/json"
+        }
+        
+        response = requests.post(url, headers=headers, data=payload)
+        return response.json()
+
+# Usage
+forwarder = WebhookForwarder(
+    pump_fun_token="your_token",
+    webhook_secret="your_secret"
+)
+
+# Forward a LiveKit event
+livekit_event = {
+    "event": "room_started",
+    "room": "room123",
+    "created_at": 1234567890
+}
+forwarder.forward_livekit_event(livekit_event)
+
+# Forward a call event
+call_event = {
+    "event_type": "call.started",
+    "call_id": "abc123",
+    "timestamp": 1234567890
+}
+forwarder.forward_call_event(call_event)
+```
+
+## Best practices
+
+<Steps>
+  <Step title="Verify signatures">
+    Always verify webhook signatures using HMAC to ensure authenticity and prevent tampering.
+  </Step>
+  
+  <Step title="Return quickly">
+    Process webhooks asynchronously. Respond with 200 status immediately and handle processing in background jobs.
+  </Step>
+  
+  <Step title="Implement idempotency">
+    Use event IDs to track processed webhooks and prevent duplicate processing.
+  </Step>
+  
+  <Step title="Handle retries">
+    Implement proper retry logic with exponential backoff for failed webhook deliveries.
+  </Step>
+  
+  <Step title="Log events">
+    Maintain detailed logs of webhook events for debugging and auditing purposes.
+  </Step>
+  
+  <Step title="Secure your endpoint">
+    Use HTTPS and validate all incoming requests to prevent unauthorized access.
+  </Step>
+</Steps>
+
+<Note>
+Webhook endpoints should respond within 5 seconds. For long-running operations, use a message queue or background job processor.
+</Note>
+
+## Testing webhooks locally
+
+Use tools like ngrok to expose your local webhook receiver:
+
+```bash
+# Install ngrok
+brew install ngrok  # macOS
+# or download from https://ngrok.com
+
+# Expose local port
+ngrok http 8080
+
+# Use the generated URL as your webhook endpoint
+# Example: https://abc123.ngrok.io/webhooks/livekit
+```
+
+This allows you to test webhook integration during development without deploying to a public server.

@@ -1,0 +1,404 @@
+---
+title: Pagination
+description: Learn how to efficiently navigate large datasets using offset and limit parameters
+---
+
+Most Pump.fun API endpoints that return lists support pagination through `offset` and `limit` parameters. This guide covers best practices for paginating through large result sets.
+
+## Basic pagination
+
+The standard pagination pattern uses two parameters:
+
+- `limit` - Number of items to return (page size)
+- `offset` - Number of items to skip (starting position)
+
+### Simple pagination example
+
+<CodeGroup>
+```bash cURL
+# Get first page (items 0-49)
+curl -X GET "https://frontend-api-v3.pump.fun/coins/search?limit=50&offset=0&searchTerm=&sort=created_timestamp&order=desc&includeNsfw=false" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+
+# Get second page (items 50-99)
+curl -X GET "https://frontend-api-v3.pump.fun/coins/search?limit=50&offset=50&searchTerm=&sort=created_timestamp&order=desc&includeNsfw=false" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/coins/search"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+# Get first page
+params = {
+    "limit": 50,
+    "offset": 0,
+    "searchTerm": "",
+    "sort": "created_timestamp",
+    "order": "desc",
+    "includeNsfw": False
+}
+response = requests.get(url, headers=headers, params=params)
+page_1 = response.json()
+
+# Get second page
+params["offset"] = 50
+response = requests.get(url, headers=headers, params=params)
+page_2 = response.json()
+```
+</CodeGroup>
+
+## Iterate through all pages
+
+Automatically paginate through all available results:
+
+```python Python
+import requests
+from typing import List, Dict, Any
+
+def fetch_all_results(url: str, headers: Dict[str, str], 
+                      params: Dict[str, Any], page_size: int = 100) -> List[Dict]:
+    """
+    Fetch all results by paginating through pages
+    """
+    all_results = []
+    offset = 0
+    
+    while True:
+        # Update pagination parameters
+        params["limit"] = page_size
+        params["offset"] = offset
+        
+        # Fetch page
+        response = requests.get(url, headers=headers, params=params)
+        
+        if response.status_code != 200:
+            print(f"Error: {response.status_code}")
+            break
+        
+        results = response.json()
+        
+        # Stop if no results returned
+        if not results:
+            break
+        
+        all_results.extend(results)
+        
+        # Stop if we got fewer results than requested (last page)
+        if len(results) < page_size:
+            break
+        
+        # Move to next page
+        offset += page_size
+    
+    return all_results
+
+# Usage
+url = "https://frontend-api-v3.pump.fun/coins/search"
+headers = {"Authorization": "Bearer <your_token>", "Accept": "application/json"}
+params = {
+    "searchTerm": "DOGE",
+    "sort": "market_cap",
+    "order": "desc",
+    "includeNsfw": False
+}
+
+all_coins = fetch_all_results(url, headers, params, page_size=100)
+print(f"Total results: {len(all_coins)}")
+```
+
+<Tip>
+Detect the last page by checking if the returned results are fewer than your requested `limit`.
+</Tip>
+
+## Pagination with rate limiting
+
+Implement pagination with proper rate limiting handling:
+
+```python Python
+import requests
+import time
+from typing import List, Dict, Any, Optional
+
+class PaginatedFetcher:
+    def __init__(self, token: str, delay: float = 0.5):
+        self.headers = {
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/json"
+        }
+        self.delay = delay  # Delay between requests
+    
+    def fetch_paginated(self, url: str, params: Dict[str, Any], 
+                       page_size: int = 100, max_results: Optional[int] = None) -> List[Dict]:
+        """
+        Fetch paginated results with rate limiting
+        """
+        all_results = []
+        offset = 0
+        
+        while True:
+            # Check if we've reached max_results
+            if max_results and len(all_results) >= max_results:
+                break
+            
+            # Update pagination params
+            params["limit"] = page_size
+            params["offset"] = offset
+            
+            try:
+                response = requests.get(url, headers=self.headers, params=params)
+                
+                # Handle rate limiting
+                if response.status_code == 429:
+                    retry_after = int(response.headers.get('Retry-After', 60))
+                    print(f"Rate limited. Waiting {retry_after}s...")
+                    time.sleep(retry_after)
+                    continue
+                
+                if response.status_code != 200:
+                    print(f"Error {response.status_code}: {response.text}")
+                    break
+                
+                results = response.json()
+                
+                if not results:
+                    break
+                
+                all_results.extend(results)
+                print(f"Fetched {len(results)} results (total: {len(all_results)})")
+                
+                # Check if last page
+                if len(results) < page_size:
+                    break
+                
+                offset += page_size
+                
+                # Respectful delay between requests
+                time.sleep(self.delay)
+                
+            except Exception as e:
+                print(f"Error: {e}")
+                break
+        
+        return all_results
+
+# Usage
+fetcher = PaginatedFetcher("your_token", delay=0.5)
+url = "https://frontend-api-v3.pump.fun/coins/search"
+params = {
+    "searchTerm": "",
+    "sort": "created_timestamp",
+    "order": "desc",
+    "includeNsfw": False
+}
+
+coins = fetcher.fetch_paginated(url, params, page_size=100, max_results=500)
+```
+
+<Warning>
+Always implement delays between paginated requests to avoid rate limiting. A 0.5-1 second delay is recommended.
+</Warning>
+
+## Pagination for trades
+
+Paginate through trade history for a specific coin:
+
+```python Python
+import requests
+from typing import List, Dict
+
+def fetch_all_trades(mint: str, minimum_size: int = 0, page_size: int = 100) -> List[Dict]:
+    """
+    Fetch all trades for a coin with pagination
+    """
+    url = f"https://frontend-api-v3.pump.fun/trades/all/{mint}"
+    headers = {
+        "Authorization": "Bearer <your_token>",
+        "Accept": "application/json"
+    }
+    
+    all_trades = []
+    offset = 0
+    
+    while True:
+        params = {
+            "limit": page_size,
+            "offset": offset,
+            "minimumSize": minimum_size
+        }
+        
+        response = requests.get(url, headers=headers, params=params)
+        trades = response.json()
+        
+        if not trades:
+            break
+        
+        all_trades.extend(trades)
+        print(f"Fetched {len(trades)} trades (total: {len(all_trades)})")
+        
+        if len(trades) < page_size:
+            break
+        
+        offset += page_size
+    
+    return all_trades
+
+# Usage
+mint = "CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump"
+trades = fetch_all_trades(mint, minimum_size=1000000, page_size=100)
+print(f"Total trades with size >= 1M: {len(trades)}")
+```
+
+## Efficient pagination patterns
+
+### Calculate total pages
+
+While most endpoints don't return total counts, you can implement page counting:
+
+```python Python
+import math
+
+def estimate_total_pages(first_page_results: List, page_size: int) -> str:
+    """
+    Estimate total pages based on first page results
+    """
+    if len(first_page_results) < page_size:
+        return "1 page (last page)"
+    else:
+        return "Multiple pages (exact count unknown)"
+
+# Usage
+results = fetch_page(url, headers, params, limit=100, offset=0)
+print(estimate_total_pages(results, 100))
+```
+
+### Resume pagination
+
+Save progress to resume pagination later:
+
+```python Python
+import json
+import os
+
+class ResumablePagination:
+    def __init__(self, cache_file: str = "pagination_state.json"):
+        self.cache_file = cache_file
+    
+    def save_state(self, offset: int, total_results: int):
+        """Save pagination state"""
+        state = {
+            "offset": offset,
+            "total_results": total_results
+        }
+        with open(self.cache_file, 'w') as f:
+            json.dump(state, f)
+    
+    def load_state(self) -> tuple:
+        """Load pagination state"""
+        if os.path.exists(self.cache_file):
+            with open(self.cache_file, 'r') as f:
+                state = json.load(f)
+                return state["offset"], state["total_results"]
+        return 0, 0
+    
+    def fetch_with_resume(self, url: str, headers: dict, params: dict, page_size: int = 100):
+        """Fetch with ability to resume"""
+        offset, total_results = self.load_state()
+        all_results = []
+        
+        print(f"Resuming from offset {offset} (already fetched {total_results} items)")
+        
+        while True:
+            params["limit"] = page_size
+            params["offset"] = offset
+            
+            response = requests.get(url, headers=headers, params=params)
+            results = response.json()
+            
+            if not results:
+                break
+            
+            all_results.extend(results)
+            offset += len(results)
+            
+            # Save progress
+            self.save_state(offset, total_results + len(all_results))
+            
+            if len(results) < page_size:
+                break
+        
+        return all_results
+
+# Usage
+pagination = ResumablePagination()
+results = pagination.fetch_with_resume(url, headers, params)
+```
+
+## Common pagination endpoints
+
+Endpoints that support offset/limit pagination:
+
+<Accordion title="Coins endpoints">
+  - `GET /coins` - All coins with filtering
+  - `GET /coins/search` - Search results
+  - `GET /coins/featured/{timeWindow}` - Featured coins
+  - `GET /coins/currently-live` - Live coins
+  - `GET /coins/for-you` - Personalized recommendations
+  - `GET /coins/user-created-coins/{userId}` - User's created coins
+</Accordion>
+
+<Accordion title="Trades endpoints">
+  - `GET /trades/all/{mint}` - All trades for a coin
+  - `GET /trades/followsUserId/{mint}` - Trades from followed users
+</Accordion>
+
+<Accordion title="Replies endpoints">
+  - `GET /replies` - All replies
+  - `GET /replies/{mint}` - Replies for a coin
+  - `GET /replies/user-replies/{address}` - User's replies
+</Accordion>
+
+<Accordion title="Other endpoints">
+  - `GET /notifications` - User notifications
+  - `GET /moderation/logs` - Moderation logs
+  - `GET /bookmarks/{id}` - Bookmark items
+</Accordion>
+
+## Best practices
+
+<Steps>
+  <Step title="Choose appropriate page sizes">
+    Use 50-100 items per page for most use cases. Smaller for real-time updates, larger for bulk processing.
+  </Step>
+  
+  <Step title="Implement exponential backoff">
+    When encountering rate limits, use exponential backoff before retrying.
+  </Step>
+  
+  <Step title="Add delays between pages">
+    Wait 0.5-1 second between page requests to be respectful of API resources.
+  </Step>
+  
+  <Step title="Handle empty results">
+    Always check for empty arrays to detect the last page.
+  </Step>
+  
+  <Step title="Cache results locally">
+    Store fetched data locally to avoid re-fetching the same pages.
+  </Step>
+  
+  <Step title="Monitor progress">
+    Log progress during pagination to help with debugging and resumption.
+  </Step>
+</Steps>
+
+<Note>
+The maximum recommended `limit` is 100. Larger values may result in timeouts or degraded performance.
+</Note>

@@ -1,0 +1,602 @@
+---
+title: 'Caching'
+description: 'Optimize performance with ETag-based caching in the Pump.fun API'
+---
+
+## Overview
+
+The Pump.fun API supports ETag-based HTTP caching to reduce bandwidth usage and improve application performance. When content hasn't changed, the API returns a `304 Not Modified` response instead of the full data, saving both bandwidth and API rate limits.
+
+<Note>
+Implementing proper caching can significantly reduce your API usage and help you stay within rate limits while providing faster responses to your users.
+</Note>
+
+## How ETag Caching Works
+
+ETags (Entity Tags) are unique identifiers assigned to specific versions of resources. The caching workflow follows these steps:
+
+1. **Initial Request:** You make a request to an endpoint
+2. **Server Response:** The API returns data with an `ETag` header
+3. **Store ETag:** Your application stores the ETag value
+4. **Subsequent Request:** Include the ETag in an `If-None-Match` header
+5. **Server Check:** The API compares the ETag to the current resource version
+6. **Response:**
+   - If unchanged: `304 Not Modified` (no body, use cached data)
+   - If changed: `200 OK` with new data and updated ETag
+
+## ETag Response Header
+
+When you request a cacheable resource, the API includes an `ETag` header:
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+ETag: W/"abc123def456"
+
+{
+  "data": "..."
+}
+```
+
+<ParamField header="ETag" type="string">
+  Unique identifier for the current version of the resource. The `W/` prefix indicates a "weak" ETag.
+</ParamField>
+
+## Using If-None-Match
+
+To check if content has changed, include the stored ETag in the `If-None-Match` header:
+
+```http
+GET /coins/{mint} HTTP/1.1
+Host: frontend-api-v3.pump.fun
+Authorization: Bearer <your_jwt_token>
+Accept: application/json
+If-None-Match: W/"abc123def456"
+```
+
+### Content Unchanged (304)
+
+If the resource hasn't changed, the API returns:
+
+```http
+HTTP/1.1 304 Not Modified
+ETag: W/"abc123def456"
+```
+
+No response body is included. Use your cached data.
+
+### Content Changed (200)
+
+If the resource has changed, the API returns:
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+ETag: W/"xyz789ghi012"
+
+{
+  "data": "... updated content ..."
+}
+```
+
+Store the new ETag and update your cache.
+
+## Implementation Examples
+
+### Basic Caching
+
+<CodeGroup>
+```python Python
+import requests
+
+class CachedAPIClient:
+    def __init__(self, token):
+        self.base_url = "https://frontend-api-v3.pump.fun"
+        self.token = token
+        self.cache = {}  # {url: {"etag": "...", "data": {...}}}
+    
+    def get(self, endpoint):
+        url = f"{self.base_url}{endpoint}"
+        headers = {
+            "Authorization": f"Bearer {self.token}",
+            "Accept": "application/json"
+        }
+        
+        # Add If-None-Match header if we have a cached ETag
+        cached = self.cache.get(url)
+        if cached and "etag" in cached:
+            headers["If-None-Match"] = cached["etag"]
+        
+        response = requests.get(url, headers=headers)
+        
+        # Handle 304 Not Modified
+        if response.status_code == 304:
+            print(f"Cache hit for {endpoint}")
+            return cached["data"]
+        
+        # Handle 200 OK - update cache
+        if response.status_code == 200:
+            data = response.json()
+            etag = response.headers.get("ETag")
+            
+            if etag:
+                self.cache[url] = {"etag": etag, "data": data}
+                print(f"Cached {endpoint} with ETag {etag}")
+            
+            return data
+        
+        response.raise_for_status()
+
+# Usage
+client = CachedAPIClient('<your_jwt_token>')
+
+# First request - fetches from API
+data1 = client.get('/coins/{mint}')
+
+# Second request - returns cached data if unchanged
+data2 = client.get('/coins/{mint}')
+```
+
+```javascript JavaScript
+class CachedAPIClient {
+  constructor(token) {
+    this.baseURL = 'https://frontend-api-v3.pump.fun';
+    this.token = token;
+    this.cache = new Map();  // url -> {etag, data}
+  }
+  
+  async get(endpoint) {
+    const url = `${this.baseURL}${endpoint}`;
+    const headers = {
+      'Authorization': `Bearer ${this.token}`,
+      'Accept': 'application/json'
+    };
+    
+    // Add If-None-Match header if we have a cached ETag
+    const cached = this.cache.get(url);
+    if (cached?.etag) {
+      headers['If-None-Match'] = cached.etag;
+    }
+    
+    const response = await fetch(url, { headers });
+    
+    // Handle 304 Not Modified
+    if (response.status === 304) {
+      console.log(`Cache hit for ${endpoint}`);
+      return cached.data;
+    }
+    
+    // Handle 200 OK - update cache
+    if (response.status === 200) {
+      const data = await response.json();
+      const etag = response.headers.get('ETag');
+      
+      if (etag) {
+        this.cache.set(url, { etag, data });
+        console.log(`Cached ${endpoint} with ETag ${etag}`);
+      }
+      
+      return data;
+    }
+    
+    throw new Error(`HTTP ${response.status}`);
+  }
+}
+
+// Usage
+const client = new CachedAPIClient('<your_jwt_token>');
+
+// First request - fetches from API
+const data1 = await client.get('/coins/{mint}');
+
+// Second request - returns cached data if unchanged
+const data2 = await client.get('/coins/{mint}');
+```
+
+```bash cURL
+#!/bin/bash
+
+TOKEN="<your_jwt_token>"
+URL="https://frontend-api-v3.pump.fun/coins/{mint}"
+CACHE_FILE=".cache_etag"
+
+# First request - save ETag
+response=$(curl -s -D - -X GET "$URL" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Accept: application/json")
+
+# Extract and save ETag
+etag=$(echo "$response" | grep -i "etag:" | cut -d' ' -f2 | tr -d '\r')
+echo "$etag" > "$CACHE_FILE"
+echo "Cached ETag: $etag"
+
+# Second request - use cached ETag
+if [ -f "$CACHE_FILE" ]; then
+    cached_etag=$(cat "$CACHE_FILE")
+    response=$(curl -s -w "\n%{http_code}" -X GET "$URL" \
+      -H "Authorization: Bearer $TOKEN" \
+      -H "Accept: application/json" \
+      -H "If-None-Match: $cached_etag")
+    
+    status_code=$(echo "$response" | tail -n1)
+    
+    if [ "$status_code" = "304" ]; then
+        echo "Cache hit - content not modified"
+    else
+        echo "Cache miss - content updated"
+    fi
+fi
+```
+</CodeGroup>
+
+### Advanced Caching with Expiration
+
+<CodeGroup>
+```python Python
+import requests
+import time
+from datetime import datetime, timedelta
+
+class AdvancedCache:
+    def __init__(self, token, ttl_seconds=300):
+        self.base_url = "https://frontend-api-v3.pump.fun"
+        self.token = token
+        self.ttl = ttl_seconds
+        self.cache = {}  # {url: {"etag": ..., "data": ..., "timestamp": ...}}
+    
+    def get(self, endpoint, force_refresh=False):
+        url = f"{self.base_url}{endpoint}"
+        headers = {
+            "Authorization": f"Bearer {self.token}",
+            "Accept": "application/json"
+        }
+        
+        # Check if cache is valid
+        cached = self.cache.get(url)
+        if cached and not force_refresh:
+            age = time.time() - cached["timestamp"]
+            
+            # If cache is too old, don't use If-None-Match
+            if age > self.ttl:
+                print(f"Cache expired for {endpoint} (age: {age:.1f}s)")
+            else:
+                headers["If-None-Match"] = cached["etag"]
+        
+        response = requests.get(url, headers=headers)
+        
+        # Handle 304 Not Modified
+        if response.status_code == 304:
+            # Update timestamp but keep existing data
+            self.cache[url]["timestamp"] = time.time()
+            print(f"Cache hit for {endpoint}")
+            return cached["data"]
+        
+        # Handle 200 OK
+        if response.status_code == 200:
+            data = response.json()
+            etag = response.headers.get("ETag")
+            
+            if etag:
+                self.cache[url] = {
+                    "etag": etag,
+                    "data": data,
+                    "timestamp": time.time()
+                }
+                print(f"Updated cache for {endpoint}")
+            
+            return data
+        
+        response.raise_for_status()
+    
+    def invalidate(self, endpoint=None):
+        """Invalidate cache for specific endpoint or all endpoints"""
+        if endpoint:
+            url = f"{self.base_url}{endpoint}"
+            if url in self.cache:
+                del self.cache[url]
+                print(f"Invalidated cache for {endpoint}")
+        else:
+            self.cache.clear()
+            print("Invalidated all cache")
+    
+    def cache_stats(self):
+        """Get cache statistics"""
+        total = len(self.cache)
+        now = time.time()
+        valid = sum(1 for c in self.cache.values() if now - c["timestamp"] < self.ttl)
+        return {"total_entries": total, "valid_entries": valid}
+
+# Usage
+cache = AdvancedCache('<your_jwt_token>', ttl_seconds=300)
+
+# Fetch data (will be cached)
+data = cache.get('/coins/{mint}')
+
+# Subsequent requests use cache
+data = cache.get('/coins/{mint}')
+
+# Force refresh
+data = cache.get('/coins/{mint}', force_refresh=True)
+
+# Check cache stats
+stats = cache.cache_stats()
+print(f"Cache stats: {stats}")
+
+# Invalidate specific endpoint
+cache.invalidate('/coins/{mint}')
+```
+
+```javascript JavaScript
+class AdvancedCache {
+  constructor(token, ttlSeconds = 300) {
+    this.baseURL = 'https://frontend-api-v3.pump.fun';
+    this.token = token;
+    this.ttl = ttlSeconds * 1000;  // Convert to milliseconds
+    this.cache = new Map();
+  }
+  
+  async get(endpoint, forceRefresh = false) {
+    const url = `${this.baseURL}${endpoint}`;
+    const headers = {
+      'Authorization': `Bearer ${this.token}`,
+      'Accept': 'application/json'
+    };
+    
+    // Check if cache is valid
+    const cached = this.cache.get(url);
+    if (cached && !forceRefresh) {
+      const age = Date.now() - cached.timestamp;
+      
+      // If cache is too old, don't use If-None-Match
+      if (age > this.ttl) {
+        console.log(`Cache expired for ${endpoint} (age: ${age/1000}s)`);
+      } else {
+        headers['If-None-Match'] = cached.etag;
+      }
+    }
+    
+    const response = await fetch(url, { headers });
+    
+    // Handle 304 Not Modified
+    if (response.status === 304) {
+      // Update timestamp but keep existing data
+      cached.timestamp = Date.now();
+      console.log(`Cache hit for ${endpoint}`);
+      return cached.data;
+    }
+    
+    // Handle 200 OK
+    if (response.status === 200) {
+      const data = await response.json();
+      const etag = response.headers.get('ETag');
+      
+      if (etag) {
+        this.cache.set(url, {
+          etag,
+          data,
+          timestamp: Date.now()
+        });
+        console.log(`Updated cache for ${endpoint}`);
+      }
+      
+      return data;
+    }
+    
+    throw new Error(`HTTP ${response.status}`);
+  }
+  
+  invalidate(endpoint = null) {
+    if (endpoint) {
+      const url = `${this.baseURL}${endpoint}`;
+      if (this.cache.delete(url)) {
+        console.log(`Invalidated cache for ${endpoint}`);
+      }
+    } else {
+      this.cache.clear();
+      console.log('Invalidated all cache');
+    }
+  }
+  
+  cacheStats() {
+    const total = this.cache.size;
+    const now = Date.now();
+    let valid = 0;
+    
+    for (const entry of this.cache.values()) {
+      if (now - entry.timestamp < this.ttl) {
+        valid++;
+      }
+    }
+    
+    return { totalEntries: total, validEntries: valid };
+  }
+}
+
+// Usage
+const cache = new AdvancedCache('<your_jwt_token>', 300);
+
+// Fetch data (will be cached)
+let data = await cache.get('/coins/{mint}');
+
+// Subsequent requests use cache
+data = await cache.get('/coins/{mint}');
+
+// Force refresh
+data = await cache.get('/coins/{mint}', true);
+
+// Check cache stats
+const stats = cache.cacheStats();
+console.log('Cache stats:', stats);
+
+// Invalidate specific endpoint
+cache.invalidate('/coins/{mint}');
+```
+</CodeGroup>
+
+## Cache Best Practices
+
+<Accordion title="Always check for 304 responses">
+  When you receive a 304 status code, use your cached data. Never treat 304 as an error.
+</Accordion>
+
+<Accordion title="Store ETags per URL">
+  Different endpoints and parameters have different ETags. Store them separately for each unique URL.
+</Accordion>
+
+<Accordion title="Set appropriate TTL">
+  Even with ETags, implement a time-to-live (TTL) for cache entries. Stale data older than your TTL should trigger a full refresh.
+</Accordion>
+
+<Accordion title="Handle missing ETags">
+  Not all endpoints support ETags. Design your cache to gracefully handle responses without ETag headers.
+</Accordion>
+
+<Accordion title="Invalidate cache on mutations">
+  When you POST, PUT, or DELETE resources, invalidate related cache entries to ensure consistency.
+</Accordion>
+
+<Accordion title="Implement cache size limits">
+  Prevent unbounded cache growth by implementing an LRU (Least Recently Used) eviction policy.
+</Accordion>
+
+## Cache Invalidation
+
+Invalidate cache entries when:
+
+- **After write operations:** Clear cache after creating, updating, or deleting resources
+- **On authentication changes:** Clear user-specific cache when logging in/out
+- **On explicit refresh:** Provide users with a manual refresh option
+- **After TTL expiration:** Automatically remove stale cache entries
+
+```python
+# Invalidate cache after mutation
+def create_coin(client, data):
+    response = requests.post(
+        "https://frontend-api-v3.pump.fun/coins",
+        headers=client.headers,
+        json=data
+    )
+    
+    if response.status_code == 201:
+        # Invalidate related cache entries
+        client.cache.invalidate('/coins')
+        client.cache.invalidate('/coins/latest')
+    
+    return response.json()
+```
+
+## Benefits of Caching
+
+<Note>
+Proper caching implementation provides multiple benefits for your application and API usage.
+</Note>
+
+### Reduced Bandwidth
+
+304 responses contain no body data, significantly reducing bandwidth usage especially for large responses.
+
+### Lower Rate Limit Usage
+
+Some API implementations don't count 304 responses against rate limits, allowing more effective requests.
+
+### Faster Response Times
+
+Cached data can be returned immediately without waiting for network requests, improving user experience.
+
+### Better Reliability
+
+Cached data can serve as fallback when the API is temporarily unavailable.
+
+## Monitoring Cache Performance
+
+Track cache effectiveness with metrics:
+
+```python
+class CacheMetrics:
+    def __init__(self):
+        self.hits = 0
+        self.misses = 0
+        self.total_requests = 0
+    
+    def record_hit(self):
+        self.hits += 1
+        self.total_requests += 1
+    
+    def record_miss(self):
+        self.misses += 1
+        self.total_requests += 1
+    
+    def hit_rate(self):
+        if self.total_requests == 0:
+            return 0
+        return self.hits / self.total_requests
+    
+    def stats(self):
+        return {
+            "hits": self.hits,
+            "misses": self.misses,
+            "total": self.total_requests,
+            "hit_rate": f"{self.hit_rate():.2%}"
+        }
+
+# Usage
+metrics = CacheMetrics()
+
+# In your cache client
+if response.status_code == 304:
+    metrics.record_hit()
+else:
+    metrics.record_miss()
+
+print(metrics.stats())
+# Output: {'hits': 75, 'misses': 25, 'total': 100, 'hit_rate': '75.00%'}
+```
+
+## Common Pitfalls
+
+<Warning>
+Avoid these common caching mistakes that can lead to stale data or poor performance.
+</Warning>
+
+### Don't Cache User-Specific Data Globally
+
+Always scope cache entries to the authenticated user:
+
+```python
+# Bad: Shares cache across users
+cache_key = f"/users/profile"
+
+# Good: User-specific cache keys
+cache_key = f"/users/profile?user={user_id}"
+```
+
+### Don't Ignore Query Parameters
+
+Different query parameters should have separate cache entries:
+
+```python
+# Bad: Same cache key for different queries
+cache_key = "/coins"
+
+# Good: Include query parameters in cache key
+cache_key = f"/coins?limit={limit}&offset={offset}"
+```
+
+### Don't Cache Error Responses
+
+Only cache successful responses:
+
+```python
+if response.status_code == 200:
+    # Cache successful response
+    cache[url] = {"etag": etag, "data": data}
+else:
+    # Don't cache errors
+    pass
+```
+
+## Related Guides
+
+- [Rate Limiting](/essentials/rate-limiting) - Reduce rate limit usage with caching
+- [Headers](/essentials/headers) - Learn about If-None-Match and ETag headers
+- [Error Handling](/essentials/error-handling) - Handle cache-related responses correctly

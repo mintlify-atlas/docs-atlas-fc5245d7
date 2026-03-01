@@ -1,0 +1,221 @@
+---
+title: 'LiveKit Tokens'
+description: 'Generate access tokens for hosts and participants'
+---
+
+## Overview
+
+LiveKit tokens provide secure, time-limited access to livestream rooms. The Pump.fun API provides separate endpoints for generating host tokens (with broadcasting permissions) and participant tokens (view-only access).
+
+## Get Host Token
+
+Generate a LiveKit access token for the stream host with full broadcasting capabilities.
+
+### Endpoint
+
+```
+GET /livestreams/livekit/token/host
+```
+
+### Query Parameters
+
+<ParamField query="mint" type="string" required>
+  The token mint address for the livestream
+</ParamField>
+
+<ParamField query="creator" type="string" required>
+  The wallet address of the stream creator/host
+</ParamField>
+
+### Example Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/livestreams/livekit/token/host?mint=<mint>&creator=<creator>" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/livestreams/livekit/token/host"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+params = {
+    "mint": "<mint>",
+    "creator": "<creator>"
+}
+
+response = requests.get(url, headers=headers, params=params)
+print(response.json())
+```
+
+```javascript JavaScript
+const mint = "<mint>";
+const creator = "<creator>";
+const url = `https://frontend-api-v3.pump.fun/livestreams/livekit/token/host?mint=${mint}&creator=${creator}`;
+
+const response = await fetch(url, {
+  method: "GET",
+  headers: {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+  }
+});
+
+const data = await response.json();
+console.log(data);
+```
+
+</CodeGroup>
+
+### Response
+
+Returns a LiveKit access token that can be used to connect to the stream as a host with broadcasting permissions.
+
+<Note>
+  Host tokens grant full permissions including video/audio publishing, screen sharing, and room management.
+</Note>
+
+---
+
+## Get Participant Token
+
+Generate a LiveKit access token for stream participants/viewers.
+
+### Endpoint
+
+```
+GET /livestreams/livekit/token/participant
+```
+
+### Query Parameters
+
+<ParamField query="mint" type="string" required>
+  The token mint address for the livestream
+</ParamField>
+
+<ParamField query="hidden" type="boolean" required>
+  Whether the participant should be hidden from the participant list. Set to `true` for anonymous viewing or `false` for visible participants.
+</ParamField>
+
+### Example Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/livestreams/livekit/token/participant?mint=<mint>&hidden=false" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/livestreams/livekit/token/participant"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+params = {
+    "mint": "<mint>",
+    "hidden": False
+}
+
+response = requests.get(url, headers=headers, params=params)
+print(response.json())
+```
+
+```javascript JavaScript
+const mint = "<mint>";
+const hidden = false;
+const url = `https://frontend-api-v3.pump.fun/livestreams/livekit/token/participant?mint=${mint}&hidden=${hidden}`;
+
+const response = await fetch(url, {
+  method: "GET",
+  headers: {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+  }
+});
+
+const data = await response.json();
+console.log(data);
+```
+
+</CodeGroup>
+
+### Response
+
+Returns a LiveKit access token that can be used to connect to the stream as a participant with view-only permissions.
+
+<Note>
+  Participant tokens provide view-only access by default. Users can watch the stream and participate in chat but cannot broadcast audio/video.
+</Note>
+
+---
+
+## Authentication
+
+Both endpoints require JWT authentication via the `Authorization: Bearer <token>` header.
+
+## Token Security
+
+<Warning>
+  LiveKit tokens are time-limited credentials. Store them securely and do not share them publicly. Tokens should be generated on-demand when users need to join a stream.
+</Warning>
+
+### Best Practices
+
+1. **Generate tokens on-demand**: Request new tokens when users join rather than pre-generating them
+2. **Use appropriate permissions**: Use host tokens only for authorized broadcasters
+3. **Implement token refresh**: Handle token expiration by requesting new tokens when needed
+4. **Secure transmission**: Always use HTTPS when transmitting tokens
+
+## Token Types Comparison
+
+| Feature | Host Token | Participant Token |
+|---------|-----------|------------------|
+| Video Publishing | Yes | No |
+| Audio Publishing | Yes | No |
+| Screen Sharing | Yes | No |
+| View Stream | Yes | Yes |
+| Chat Access | Yes | Yes |
+| Visibility Control | Always visible | Configurable via `hidden` parameter |
+
+## Common Use Cases
+
+### Token Launch Stream
+
+1. Creator obtains a **host token** to broadcast their token launch
+2. Viewers obtain **participant tokens** to watch and engage
+3. Use `hidden=true` for anonymous viewer counts
+4. Use `hidden=false` for visible community members
+
+### Interactive Sessions
+
+1. Primary host uses **host token** for main broadcast
+2. Featured guests can be promoted with appropriate permissions
+3. Audience uses **participant tokens** for viewing
+
+## Response Codes
+
+- **200 OK**: Token generated successfully
+- **401 Unauthorized**: Invalid or missing authentication token
+- **404 Not Found**: Livestream with specified mint address not found
+- **400 Bad Request**: Invalid query parameters
+
+## Related Endpoints
+
+<CardGroup cols={2}>
+  <Card title="Create Livestream" icon="plus" href="/api-reference/livestreams/create">
+    Create a new livestream before generating tokens
+  </Card>
+  <Card title="Manage Stream" icon="sliders" href="/api-reference/livestreams/manage">
+    Control stream availability and access
+  </Card>
+</CardGroup>

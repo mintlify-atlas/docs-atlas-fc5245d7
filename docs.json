@@ -1,122 +1,153 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Pump.fun API",
+  "theme": "sequoia",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#9945FF",
+    "light": "#14F195",
+    "dark": "#9945FF"
   },
-  "favicon": "/favicon.svg",
+  "navbar": {
+    "primary": {
+      "type": "github",
+      "href": "https://github.com/BankkRoll/pumpfun-apis"
+    }
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/BankkRoll/pumpfun-apis"
+    }
+  },
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Documentation",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Get Started",
             "pages": [
-              "index",
+              "introduction",
               "quickstart",
-              "development"
+              "api-versions"
             ]
           },
           {
-            "group": "Customization",
+            "group": "Essentials",
             "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "essentials/authentication",
+              "essentials/headers",
+              "essentials/error-handling",
+              "essentials/rate-limiting",
+              "essentials/caching"
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "API Reference",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "Coins",
             "pages": [
-              "api-reference/introduction"
+              "api-reference/coins/overview",
+              "api-reference/coins/get-coin",
+              "api-reference/coins/list-coins",
+              "api-reference/coins/create-coin",
+              "api-reference/coins/search",
+              "api-reference/coins/metadata"
             ]
           },
           {
-            "group": "Endpoint examples",
+            "group": "Trades",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "api-reference/trades/overview",
+              "api-reference/trades/get-trades",
+              "api-reference/trades/latest",
+              "api-reference/trades/by-signature"
+            ]
+          },
+          {
+            "group": "Users & Authentication",
+            "pages": [
+              "api-reference/users/overview",
+              "api-reference/users/get-profile",
+              "api-reference/users/register",
+              "api-reference/users/login",
+              "api-reference/users/permissions"
+            ]
+          },
+          {
+            "group": "Social Features",
+            "pages": [
+              "api-reference/social/bookmarks",
+              "api-reference/social/likes",
+              "api-reference/social/following",
+              "api-reference/social/replies",
+              "api-reference/social/timeline"
+            ]
+          },
+          {
+            "group": "Livestreams",
+            "pages": [
+              "api-reference/livestreams/overview",
+              "api-reference/livestreams/create",
+              "api-reference/livestreams/manage",
+              "api-reference/livestreams/tokens"
+            ]
+          },
+          {
+            "group": "Moderation",
+            "pages": [
+              "api-reference/moderation/overview",
+              "api-reference/moderation/ban-management",
+              "api-reference/moderation/reports",
+              "api-reference/moderation/content-filtering"
+            ]
+          },
+          {
+            "group": "Advanced Analytics",
+            "pages": [
+              "api-reference/analytics/overview",
+              "api-reference/analytics/coins-list",
+              "api-reference/analytics/graduated-coins",
+              "api-reference/analytics/kolscan",
+              "api-reference/analytics/top-holders"
+            ]
+          },
+          {
+            "group": "Utilities",
+            "pages": [
+              "api-reference/utilities/balances",
+              "api-reference/utilities/candlesticks",
+              "api-reference/utilities/notifications",
+              "api-reference/utilities/search"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Common Use Cases",
+            "pages": [
+              "guides/fetching-coins",
+              "guides/tracking-trades",
+              "guides/user-interactions",
+              "guides/working-with-websockets"
+            ]
+          },
+          {
+            "group": "Advanced Topics",
+            "pages": [
+              "guides/handling-webhooks",
+              "guides/bulk-operations",
+              "guides/pagination",
+              "guides/best-practices"
             ]
           }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
-  },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
-  },
-  "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
-      }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
-    }
-  },
-  "contextual": {
-    "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
-  },
-  "footer": {
-    "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
-    }
+    ]
   }
 }

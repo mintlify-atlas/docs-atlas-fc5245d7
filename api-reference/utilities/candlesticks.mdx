@@ -1,0 +1,189 @@
+---
+title: 'Get Candlestick Data'
+api: 'GET https://frontend-api-v3.pump.fun/candlesticks/{mint}'
+description: 'Retrieve OHLCV candlestick data for chart visualization'
+---
+
+## Overview
+
+The Candlesticks endpoint provides OHLCV (Open, High, Low, Close, Volume) data for a specific token, enabling price chart visualization and technical analysis.
+
+## Authentication
+
+This endpoint requires JWT authentication via the `Authorization` header:
+
+```bash
+Authorization: Bearer <your_token>
+```
+
+## Endpoint
+
+```
+GET https://frontend-api-v3.pump.fun/candlesticks/{mint}
+```
+
+## Path Parameters
+
+<ParamField path="mint" type="string" required>
+  The mint address of the token to get candlestick data for
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="offset" type="number" required>
+  Number of candlesticks to skip (for pagination)
+</ParamField>
+
+<ParamField query="limit" type="number" required>
+  Maximum number of candlesticks to return
+</ParamField>
+
+<ParamField query="timeframe" type="number" required>
+  Timeframe for each candlestick in minutes (e.g., 1, 5, 15, 60, 240, 1440)
+</ParamField>
+
+## Response
+
+<ResponseField name="mint" type="string">
+  The mint address of the queried token
+</ResponseField>
+
+<ResponseField name="timeframe" type="number">
+  The timeframe used for candlesticks (in minutes)
+</ResponseField>
+
+<ResponseField name="candlesticks" type="array">
+  Array of candlestick objects
+  
+  <Expandable title="Candlestick Object">
+    <ResponseField name="timestamp" type="number">
+      Unix timestamp for the candlestick period start
+    </ResponseField>
+    
+    <ResponseField name="open" type="string">
+      Opening price for the period
+    </ResponseField>
+    
+    <ResponseField name="high" type="string">
+      Highest price during the period
+    </ResponseField>
+    
+    <ResponseField name="low" type="string">
+      Lowest price during the period
+    </ResponseField>
+    
+    <ResponseField name="close" type="string">
+      Closing price for the period
+    </ResponseField>
+    
+    <ResponseField name="volume" type="string">
+      Trading volume during the period
+    </ResponseField>
+    
+    <ResponseField name="trades" type="number">
+      Number of trades during the period
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="total" type="number">
+  Total number of available candlesticks
+</ResponseField>
+
+## Common Timeframes
+
+- `1` - 1 minute
+- `5` - 5 minutes
+- `15` - 15 minutes
+- `60` - 1 hour
+- `240` - 4 hours
+- `1440` - 1 day
+
+## Example Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/candlesticks/7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr?offset=0&limit=100&timeframe=15" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+mint = "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr"
+url = f"https://frontend-api-v3.pump.fun/candlesticks/{mint}"
+params = {
+    "offset": 0,
+    "limit": 100,
+    "timeframe": 15  # 15-minute candles
+}
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, headers=headers, params=params)
+print(response.json())
+```
+
+```javascript JavaScript
+const mint = '7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr';
+const params = new URLSearchParams({
+  offset: '0',
+  limit: '100',
+  timeframe: '15'
+});
+
+fetch(`https://frontend-api-v3.pump.fun/candlesticks/${mint}?${params}`, {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer <your_token>',
+    'Accept': 'application/json'
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data));
+```
+
+```typescript TypeScript
+const mint = '7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr';
+const params = new URLSearchParams({
+  offset: '0',
+  limit: '100',
+  timeframe: '15'
+});
+
+const response = await fetch(
+  `https://frontend-api-v3.pump.fun/candlesticks/${mint}?${params}`,
+  {
+    method: 'GET',
+    headers: {
+      'Authorization': 'Bearer <your_token>',
+      'Accept': 'application/json'
+    }
+  }
+);
+
+const data = await response.json();
+console.log(data);
+```
+
+</CodeGroup>
+
+## Use Cases
+
+- Display price charts with multiple timeframes
+- Perform technical analysis on token price movements
+- Calculate trading indicators (RSI, MACD, etc.)
+- Build real-time trading dashboards
+- Analyze historical price patterns
+
+## Notes
+
+- Replace `<your_token>` with your actual JWT token
+- Choose appropriate timeframe based on your analysis needs
+- Use pagination to load historical data efficiently
+- Price values are strings to preserve precision
+- Candlestick data is essential for charting libraries

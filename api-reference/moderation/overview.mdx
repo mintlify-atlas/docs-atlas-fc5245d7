@@ -1,0 +1,110 @@
+---
+title: "Moderation Overview"
+description: "Admin tools for content moderation, user management, and community safety"
+---
+
+The Pump.fun Moderation API provides comprehensive tools for platform administrators to maintain community standards, manage content visibility, and enforce platform policies.
+
+## Key Features
+
+### Ban Management
+Control which content and users appear on the platform through:
+- **Text-based filtering**: Ban specific terms or regex patterns in token names and descriptions
+- **Image moderation**: Flag and filter inappropriate image content
+- **User bans**: Ban wallet addresses from creating or interacting with content
+- **Bulk operations**: Perform moderation actions at scale
+
+### Report Handling
+Manage user-submitted reports for:
+- Inappropriate content
+- Scam tokens
+- Offensive behavior
+- Community guideline violations
+
+### Content Filtering
+Granular control over content visibility:
+- Mark tokens as NSFW (Not Safe For Work)
+- Hide content from public feeds
+- Delete inappropriate photos
+- Bulk moderation operations
+
+### Audit Logging
+Track all moderation actions with detailed logs including:
+- Moderator identity
+- Action type and timestamp
+- Target content or user
+- Action outcomes
+
+## Authentication
+
+<Warning>
+  All moderation endpoints require JWT authentication with admin privileges. Include your token in the Authorization header:
+  ```
+  Authorization: Bearer <your_admin_token>
+  ```
+</Warning>
+
+## Base URL
+
+All moderation endpoints use the base URL:
+```
+https://frontend-api-v3.pump.fun
+```
+
+## Endpoint Categories
+
+### Ban Management
+Manage banned terms, patterns, images, and users:
+- `/moderation/ban-terms` - Text-based content filtering
+- `/moderation/ban-regex-patterns` - Pattern-based filtering
+- `/moderation/ban-image-terms` - Image content filtering
+- `/moderation/ban-users` - User address bans
+- `/moderation/ban/{id}` - Ban specific content
+- `/moderation/ban/address/{address}` - Ban wallet addresses
+
+### Reports
+Handle user-submitted content reports:
+- `/reports` - Create and retrieve reports
+- `/reports/update` - Update report status
+- `/reports/reportComment` - Report comments
+- `/reports/{id}` - Delete resolved reports
+
+### Content Filtering
+Control content visibility and classification:
+- `/moderation/mark-as-nsfw/{mint}` - Flag NSFW content
+- `/moderation/mark-as-hidden/{id}` - Hide content from feeds
+- `/moderation/mark-as-ignored/{id}` - Ignore reports
+- `/moderation/delete-photo/{mint}` - Remove inappropriate images
+- `/moderation/bulk-nsfw` - Bulk NSFW marking
+- `/moderation/bulk-hidden` - Bulk hiding
+- `/moderation/bulk-ban` - Bulk banning
+
+### Audit & Logs
+Track moderation activity:
+- `/moderation/logs` - Retrieve moderation action logs
+
+## Best Practices
+
+1. **Use regex patterns wisely**: Test patterns thoroughly to avoid false positives
+2. **Document ban reasons**: Maintain internal records of why content was banned
+3. **Review reports promptly**: Timely moderation improves community trust
+4. **Leverage bulk operations**: For efficiency when moderating multiple items
+5. **Monitor moderation logs**: Regular audits help identify trends and improve policies
+
+## Rate Limiting
+
+Moderation endpoints are subject to rate limiting to prevent abuse. If you exceed limits, you'll receive a 429 status code. Contact support for higher limits if needed.
+
+## Next Steps
+
+<CardGroup cols={3}>
+  <Card title="Ban Management" icon="ban" href="/api-reference/moderation/ban-management">
+    Learn how to manage banned terms, patterns, and users
+  </Card>
+  <Card title="Reports" icon="flag" href="/api-reference/moderation/reports">
+    Handle user-submitted content reports
+  </Card>
+  <Card title="Content Filtering" icon="filter" href="/api-reference/moderation/content-filtering">
+    Control content visibility and NSFW classification
+  </Card>
+</CardGroup>

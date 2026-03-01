@@ -1,0 +1,258 @@
+---
+title: 'Request Headers'
+description: 'Required and recommended HTTP headers for Pump.fun API requests'
+---
+
+## Overview
+
+Proper HTTP headers are essential for successful API requests to the Pump.fun API. This guide covers all required and recommended headers to ensure your requests are processed correctly.
+
+## Required Headers
+
+### Authorization
+
+The `Authorization` header is required for authenticated endpoints and recommended for all requests.
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for JWT authentication
+</ParamField>
+
+```bash
+Authorization: Bearer <your_jwt_token>
+```
+
+<Note>
+Most API endpoints require authentication. Include this header with all requests to ensure complete data retrieval and avoid access issues.
+</Note>
+
+### Accept
+
+The `Accept` header tells the API what content type you expect in the response.
+
+<ParamField header="Accept" type="string" required>
+  Expected response content type
+</ParamField>
+
+```bash
+Accept: application/json
+```
+
+You can also use:
+```bash
+Accept: */*
+```
+
+Both formats are accepted by the API.
+
+### Origin
+
+The `Origin` header indicates the origin of the request. This is required for CORS compliance.
+
+<ParamField header="Origin" type="string" required>
+  Origin domain of the request
+</ParamField>
+
+```bash
+Origin: https://pump.fun
+```
+
+<Warning>
+The API validates the Origin header for security. Always use `https://pump.fun` as the origin value.
+</Warning>
+
+### Content-Type
+
+For POST, PUT, and PATCH requests that include a request body, the `Content-Type` header is required.
+
+<ParamField header="Content-Type" type="string" required="For requests with body">
+  Format of the request body
+</ParamField>
+
+```bash
+Content-Type: application/json
+```
+
+## Optional Headers
+
+### If-None-Match
+
+Use this header for efficient caching. Include the ETag value from a previous response to check if content has changed.
+
+<ParamField header="If-None-Match" type="string">
+  ETag value from previous response
+</ParamField>
+
+```bash
+If-None-Match: W/"etag-value"
+```
+
+If the content hasn't changed, the API returns a `304 Not Modified` response, saving bandwidth.
+
+See the [Caching](/essentials/caching) guide for more details.
+
+## Example Requests
+
+### GET Request
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/coins/{mint}" \
+  -H "Authorization: Bearer <your_jwt_token>" \
+  -H "Accept: application/json" \
+  -H "Origin: https://pump.fun"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/coins/{mint}"
+headers = {
+    "Authorization": "Bearer <your_jwt_token>",
+    "Accept": "application/json",
+    "Origin": "https://pump.fun"
+}
+
+response = requests.get(url, headers=headers)
+data = response.json()
+```
+
+```javascript JavaScript
+const response = await fetch('https://frontend-api-v3.pump.fun/coins/{mint}', {
+  headers: {
+    'Authorization': 'Bearer <your_jwt_token>',
+    'Accept': 'application/json',
+    'Origin': 'https://pump.fun'
+  }
+});
+
+const data = await response.json();
+```
+</CodeGroup>
+
+### POST Request
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/auth/login" \
+  -H "Authorization: Bearer <your_jwt_token>" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -H "Origin: https://pump.fun" \
+  -d '{"key": "value"}'
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/auth/login"
+headers = {
+    "Authorization": "Bearer <your_jwt_token>",
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Origin": "https://pump.fun"
+}
+
+data = {"key": "value"}
+response = requests.post(url, headers=headers, json=data)
+```
+
+```javascript JavaScript
+const response = await fetch('https://frontend-api-v3.pump.fun/auth/login', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer <your_jwt_token>',
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+    'Origin': 'https://pump.fun'
+  },
+  body: JSON.stringify({key: 'value'})
+});
+
+const data = await response.json();
+```
+</CodeGroup>
+
+### Request with Caching
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/coins/{mint}" \
+  -H "Authorization: Bearer <your_jwt_token>" \
+  -H "Accept: application/json" \
+  -H "Origin: https://pump.fun" \
+  -H "If-None-Match: W/\"abc123\""
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/coins/{mint}"
+headers = {
+    "Authorization": "Bearer <your_jwt_token>",
+    "Accept": "application/json",
+    "Origin": "https://pump.fun",
+    "If-None-Match": 'W/"abc123"'
+}
+
+response = requests.get(url, headers=headers)
+if response.status_code == 304:
+    print("Content not modified, use cached version")
+else:
+    data = response.json()
+```
+
+```javascript JavaScript
+const response = await fetch('https://frontend-api-v3.pump.fun/coins/{mint}', {
+  headers: {
+    'Authorization': 'Bearer <your_jwt_token>',
+    'Accept': 'application/json',
+    'Origin': 'https://pump.fun',
+    'If-None-Match': 'W/"abc123"'
+  }
+});
+
+if (response.status === 304) {
+  console.log('Content not modified, use cached version');
+} else {
+  const data = await response.json();
+}
+```
+</CodeGroup>
+
+## Header Quick Reference
+
+| Header | Value | Required | Use Case |
+|--------|-------|----------|----------|
+| `Authorization` | `Bearer <JWT>` | Yes | Authentication for all protected endpoints |
+| `Accept` | `application/json` or `*/*` | Yes | Specify expected response format |
+| `Origin` | `https://pump.fun` | Yes | CORS compliance |
+| `Content-Type` | `application/json` | For POST/PUT/PATCH | Specify request body format |
+| `If-None-Match` | `W/"etag-value"` | Optional | Enable response caching |
+
+## Best Practices
+
+<Accordion title="Always include authentication">
+  Even if an endpoint doesn't strictly require authentication, including the Authorization header ensures you receive complete data and avoid potential access restrictions.
+</Accordion>
+
+<Accordion title="Set the correct Content-Type">
+  For requests with a JSON body, always set `Content-Type: application/json`. Mismatched content types may result in 400 Bad Request errors.
+</Accordion>
+
+<Accordion title="Use caching headers">
+  Implement the `If-None-Match` header with ETag values to reduce bandwidth and improve performance. The API will return 304 responses when content hasn't changed.
+</Accordion>
+
+<Accordion title="Validate origin">
+  Always use `https://pump.fun` as the Origin header value. Other origins may be rejected by CORS policies.
+</Accordion>
+
+## Common Header Errors
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| `401 Unauthorized` | Missing or invalid Authorization header | Include valid JWT token in Authorization header |
+| `400 Bad Request` | Missing Content-Type on POST/PUT | Add `Content-Type: application/json` header |
+| `403 Forbidden` | Invalid Origin header | Use `Origin: https://pump.fun` |
+
+For more information, see the [Authentication](/essentials/authentication) and [Error Handling](/essentials/error-handling) guides.

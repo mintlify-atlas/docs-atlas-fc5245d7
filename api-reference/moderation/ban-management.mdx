@@ -1,0 +1,385 @@
+---
+title: "Ban Management"
+description: "Manage banned terms, regex patterns, images, and user addresses"
+---
+
+## Overview
+
+Ban management allows administrators to prevent specific content from appearing on the platform by filtering text, patterns, images, and blocking user addresses.
+
+<Warning>
+  All ban management endpoints require admin authentication. Changes take effect immediately and apply platform-wide.
+</Warning>
+
+## Ban Terms
+
+Manage banned text terms that will be filtered from token names and descriptions.
+
+### Get Ban Terms
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/moderation/ban-terms" \
+  -H "Authorization: Bearer <your_token>"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/moderation/ban-terms"
+headers = {"Authorization": "Bearer <your_token>"}
+
+response = requests.get(url, headers=headers)
+print(response.json())
+```
+</CodeGroup>
+
+Retrieves a list of all currently banned terms.
+
+### Add Ban Term
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/moderation/ban-terms" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Content-Type: application/json" \
+  -d '{"term": "inappropriate_word"}'
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/moderation/ban-terms"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Content-Type": "application/json"
+}
+data = {"term": "inappropriate_word"}
+
+response = requests.post(url, headers=headers, json=data)
+print(response.json())
+```
+</CodeGroup>
+
+Adds a new term to the ban list. Content containing this term will be filtered.
+
+### Remove Ban Term
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE "https://frontend-api-v3.pump.fun/moderation/ban-terms/{id}" \
+  -H "Authorization: Bearer <your_token>"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/moderation/ban-terms/{id}"
+headers = {"Authorization": "Bearer <your_token>"}
+
+response = requests.delete(url, headers=headers)
+print(response.json())
+```
+</CodeGroup>
+
+<ParamField path="id" type="string" required>
+  The ID of the ban term to remove
+</ParamField>
+
+## Regex Ban Patterns
+
+Use regular expressions for more sophisticated content filtering.
+
+### Get Regex Patterns
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/moderation/ban-regex-patterns" \
+  -H "Authorization: Bearer <your_token>"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/moderation/ban-regex-patterns"
+headers = {"Authorization": "Bearer <your_token>"}
+
+response = requests.get(url, headers=headers)
+print(response.json())
+```
+</CodeGroup>
+
+Retrieves all active regex ban patterns.
+
+### Add Regex Pattern
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/moderation/ban-regex-patterns" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Content-Type: application/json" \
+  -d '{"pattern": "[0-9]{10,}"}'
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/moderation/ban-regex-patterns"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Content-Type": "application/json"
+}
+data = {"pattern": "[0-9]{10,}"}
+
+response = requests.post(url, headers=headers, json=data)
+print(response.json())
+```
+</CodeGroup>
+
+<Warning>
+  Test regex patterns thoroughly before adding them to avoid unintended filtering. Invalid patterns may cause errors.
+</Warning>
+
+### Remove Regex Pattern
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE "https://frontend-api-v3.pump.fun/moderation/ban-regex-patterns/{id}" \
+  -H "Authorization: Bearer <your_token>"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/moderation/ban-regex-patterns/{id}"
+headers = {"Authorization": "Bearer <your_token>"}
+
+response = requests.delete(url, headers=headers)
+print(response.json())
+```
+</CodeGroup>
+
+<ParamField path="id" type="string" required>
+  The ID of the regex pattern to remove
+</ParamField>
+
+## Image Ban Terms
+
+Manage banned terms for image content filtering.
+
+### Get Image Ban Terms
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/moderation/ban-image-terms" \
+  -H "Authorization: Bearer <your_token>"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/moderation/ban-image-terms"
+headers = {"Authorization": "Bearer <your_token>"}
+
+response = requests.get(url, headers=headers)
+print(response.json())
+```
+</CodeGroup>
+
+### Add Image Ban Term
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/moderation/ban-image-terms" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Content-Type: application/json" \
+  -d '{"term": "inappropriate_image_label"}'
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/moderation/ban-image-terms"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Content-Type": "application/json"
+}
+data = {"term": "inappropriate_image_label"}
+
+response = requests.post(url, headers=headers, json=data)
+print(response.json())
+```
+</CodeGroup>
+
+### Remove Image Ban Term
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE "https://frontend-api-v3.pump.fun/moderation/ban-image-terms/{id}" \
+  -H "Authorization: Bearer <your_token>"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/moderation/ban-image-terms/{id}"
+headers = {"Authorization": "Bearer <your_token>"}
+
+response = requests.delete(url, headers=headers)
+print(response.json())
+```
+</CodeGroup>
+
+<ParamField path="id" type="string" required>
+  The ID of the image ban term to remove
+</ParamField>
+
+## User Bans
+
+Manage banned user addresses.
+
+### Get Banned Users
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/moderation/ban-users?limit=50&offset=0&sortBy=createdAt&order=desc&searchQuery=&active=true&unbanRequest=false&fromDate=&toDate=" \
+  -H "Authorization: Bearer <your_token>"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/moderation/ban-users"
+headers = {"Authorization": "Bearer <your_token>"}
+params = {
+    "limit": 50,
+    "offset": 0,
+    "sortBy": "createdAt",
+    "order": "desc",
+    "searchQuery": "",
+    "active": "true",
+    "unbanRequest": "false",
+    "fromDate": "",
+    "toDate": ""
+}
+
+response = requests.get(url, headers=headers, params=params)
+print(response.json())
+```
+</CodeGroup>
+
+<ParamField query="limit" type="string" required>
+  Number of results to return
+</ParamField>
+
+<ParamField query="offset" type="string" required>
+  Number of results to skip for pagination
+</ParamField>
+
+<ParamField query="sortBy" type="string" required>
+  Field to sort by (e.g., createdAt, address)
+</ParamField>
+
+<ParamField query="order" type="string" required>
+  Sort order: asc or desc
+</ParamField>
+
+<ParamField query="searchQuery" type="string" required>
+  Search term to filter users
+</ParamField>
+
+<ParamField query="active" type="string" required>
+  Filter by active ban status (true/false)
+</ParamField>
+
+<ParamField query="unbanRequest" type="string" required>
+  Filter users with unban requests (true/false)
+</ParamField>
+
+<ParamField query="fromDate" type="string" required>
+  Filter bans from this date (ISO 8601 format)
+</ParamField>
+
+<ParamField query="toDate" type="string" required>
+  Filter bans until this date (ISO 8601 format)
+</ParamField>
+
+### Ban User Address
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/moderation/ban/address/{address}" \
+  -H "Authorization: Bearer <your_token>"
+```
+
+```python Python
+import requests
+
+address = "DYw8jCTfwHNRJhhmFcbXvVDTqWMEVFBX6ZKUmG5CNSKK"
+url = f"https://frontend-api-v3.pump.fun/moderation/ban/address/{address}"
+headers = {"Authorization": "Bearer <your_token>"}
+
+response = requests.post(url, headers=headers)
+print(response.json())
+```
+</CodeGroup>
+
+<ParamField path="address" type="string" required>
+  The wallet address to ban from the platform
+</ParamField>
+
+### Ban Content by ID
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://frontend-api-v3.pump.fun/moderation/ban/{id}" \
+  -H "Authorization: Bearer <your_token>"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/moderation/ban/{id}"
+headers = {"Authorization": "Bearer <your_token>"}
+
+response = requests.post(url, headers=headers)
+print(response.json())
+```
+</CodeGroup>
+
+<ParamField path="id" type="number" required>
+  The ID of the content to ban
+</ParamField>
+
+### Get Ban Details
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/moderation/ban?id={id}" \
+  -H "Authorization: Bearer <your_token>"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/moderation/ban"
+headers = {"Authorization": "Bearer <your_token>"}
+params = {"id": 123}
+
+response = requests.get(url, headers=headers, params=params)
+print(response.json())
+```
+</CodeGroup>
+
+<ParamField path="id" type="number" required>
+  The ID of the ban to retrieve
+</ParamField>
+
+## Best Practices
+
+1. **Start with specific terms**: Add exact matches before using regex patterns
+2. **Test patterns**: Verify regex patterns don't create false positives
+3. **Document bans**: Keep records of why terms or addresses were banned
+4. **Review regularly**: Periodically audit ban lists to ensure they're still relevant
+5. **Use bulk operations**: For banning multiple addresses, consider using bulk endpoints
+6. **Monitor effectiveness**: Check moderation logs to see if bans are working as intended

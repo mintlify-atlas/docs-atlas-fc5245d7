@@ -1,0 +1,227 @@
+---
+title: Fetching coins
+description: Learn how to query coins using the Pump.fun API with different filters and search methods
+---
+
+The Pump.fun API provides multiple endpoints to fetch coin data based on your needs. This guide covers the most common patterns for querying coins.
+
+## Get latest coins
+
+Fetch the most recently created coins using the `/coins/latest` endpoint:
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/coins/latest" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/coins/latest"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, headers=headers)
+print(response.json())
+```
+</CodeGroup>
+
+## Get featured coins
+
+Retrieve coins featured within a specific time window (e.g., "1h", "6h", "24h"):
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/coins/featured/24h?limit=20&offset=0&includeNsfw=false" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/coins/featured/24h"
+params = {
+    "limit": 20,
+    "offset": 0,
+    "includeNsfw": False
+}
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, headers=headers, params=params)
+coins = response.json()
+```
+</CodeGroup>
+
+<Note>
+The `timeWindow` path parameter accepts values like "1h", "6h", "24h" to filter coins by their feature time period.
+</Note>
+
+## Search for coins
+
+Search coins by name, symbol, or other criteria using the `/coins/search` endpoint:
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/coins/search?limit=50&offset=0&searchTerm=DOGE&sort=market_cap&order=desc&includeNsfw=false" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/coins/search"
+params = {
+    "limit": 50,
+    "offset": 0,
+    "searchTerm": "DOGE",
+    "sort": "market_cap",
+    "order": "desc",
+    "includeNsfw": False
+}
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, headers=headers, params=params)
+results = response.json()
+```
+</CodeGroup>
+
+### Search parameters
+
+- `searchTerm` - Keyword to search for in coin names/symbols
+- `sort` - Field to sort by (e.g., "market_cap", "created_timestamp")
+- `order` - Sort direction ("asc" or "desc")
+- `includeNsfw` - Whether to include NSFW-flagged coins
+- `complete` - Filter by graduation status
+
+## Get coin by mint address
+
+Fetch detailed information about a specific coin using its mint address:
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/coins/CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+mint = "CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump"
+url = f"https://frontend-api-v3.pump.fun/coins/{mint}"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, headers=headers)
+coin_data = response.json()
+```
+</CodeGroup>
+
+<Tip>
+Use the `sync=true` query parameter to force a synchronization with the blockchain for the most up-to-date data.
+</Tip>
+
+## Bulk fetch coins by mints
+
+Retrieve multiple coins in a single request using the bulk endpoint:
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://advanced-api-v2.pump.fun/coins/mints" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mints": [
+      "CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump",
+      "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr"
+    ]
+  }'
+```
+
+```python Python
+import requests
+
+url = "https://advanced-api-v2.pump.fun/coins/mints"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Content-Type": "application/json"
+}
+data = {
+    "mints": [
+        "CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump",
+        "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr"
+    ]
+}
+
+response = requests.post(url, headers=headers, json=data)
+coins = response.json()
+```
+</CodeGroup>
+
+## Get currently live coins
+
+Fetch coins with active livestreams:
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/coins/currently-live?limit=20&offset=0&includeNsfw=false" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/coins/currently-live"
+params = {
+    "limit": 20,
+    "offset": 0,
+    "includeNsfw": False
+}
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, headers=headers, params=params)
+live_coins = response.json()
+```
+</CodeGroup>
+
+## Best practices
+
+<Steps>
+  <Step title="Use pagination">
+    Always specify `limit` and `offset` parameters to paginate through large result sets efficiently.
+  </Step>
+  
+  <Step title="Filter NSFW content">
+    Set `includeNsfw=false` in production applications to filter out inappropriate content.
+  </Step>
+  
+  <Step title="Use bulk endpoints">
+    When fetching multiple coins, use the `/coins/mints` bulk endpoint instead of making individual requests.
+  </Step>
+  
+  <Step title="Cache responses">
+    Implement caching with ETag headers to reduce API calls and improve performance.
+  </Step>
+</Steps>
+
+<Warning>
+All coin endpoints require authentication via JWT Bearer token. Make sure to include the `Authorization` header in every request.
+</Warning>

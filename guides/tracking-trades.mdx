@@ -1,0 +1,281 @@
+---
+title: Tracking trades
+description: Monitor trades for specific coins, implement pagination, and filter by trade size
+---
+
+The Pump.fun API provides powerful endpoints for tracking trades on specific coins. This guide shows you how to monitor trading activity effectively.
+
+## Get all trades for a coin
+
+Retrieve all trades for a specific coin using its mint address:
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/trades/all/CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump?limit=50&offset=0&minimumSize=0" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+mint = "CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump"
+url = f"https://frontend-api-v3.pump.fun/trades/all/{mint}"
+params = {
+    "limit": 50,
+    "offset": 0,
+    "minimumSize": 0
+}
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, headers=headers, params=params)
+trades = response.json()
+```
+</CodeGroup>
+
+## Filter trades by size
+
+Use the `minimumSize` parameter to filter out small trades and focus on significant transactions:
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/trades/all/CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump?limit=50&offset=0&minimumSize=1000000" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+mint = "CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump"
+url = f"https://frontend-api-v3.pump.fun/trades/all/{mint}"
+params = {
+    "limit": 50,
+    "offset": 0,
+    "minimumSize": 1000000  # Filter trades >= 1M tokens
+}
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, headers=headers, params=params)
+large_trades = response.json()
+```
+</CodeGroup>
+
+<Tip>
+The `minimumSize` parameter helps reduce noise by filtering out small trades, making it easier to track whale activity.
+</Tip>
+
+## Get trade count
+
+Retrieve the total number of trades for a coin:
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/trades/count/CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump?minimumSize=0" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+mint = "CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump"
+url = f"https://frontend-api-v3.pump.fun/trades/count/{mint}"
+params = {"minimumSize": 0}
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, headers=headers, params=params)
+trade_count = response.json()
+```
+</CodeGroup>
+
+## Paginate through trades
+
+Implement pagination to efficiently retrieve large trade histories:
+
+```python Python
+import requests
+
+def fetch_all_trades(mint, minimum_size=0, page_size=100):
+    """
+    Fetch all trades for a coin with pagination
+    """
+    url = f"https://frontend-api-v3.pump.fun/trades/all/{mint}"
+    headers = {
+        "Authorization": "Bearer <your_token>",
+        "Accept": "application/json"
+    }
+    
+    all_trades = []
+    offset = 0
+    
+    while True:
+        params = {
+            "limit": page_size,
+            "offset": offset,
+            "minimumSize": minimum_size
+        }
+        
+        response = requests.get(url, headers=headers, params=params)
+        trades = response.json()
+        
+        if not trades:
+            break
+            
+        all_trades.extend(trades)
+        offset += page_size
+        
+        # Stop if we got fewer results than requested
+        if len(trades) < page_size:
+            break
+    
+    return all_trades
+
+# Usage
+mint = "CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump"
+all_trades = fetch_all_trades(mint, minimum_size=100000)
+print(f"Total trades: {len(all_trades)}")
+```
+
+<Note>
+When paginating, monitor the number of results returned. If you receive fewer results than your `limit`, you've reached the end of the data.
+</Note>
+
+## Track trades from followed users
+
+Monitor trades made by users that a specific user follows:
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/trades/followsUserId/CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump?followsUserId=user123&limit=50&offset=0&minimumSize=0" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+mint = "CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump"
+url = f"https://frontend-api-v3.pump.fun/trades/followsUserId/{mint}"
+params = {
+    "followsUserId": "user123",
+    "limit": 50,
+    "offset": 0,
+    "minimumSize": 0
+}
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, headers=headers, params=params)
+followed_trades = response.json()
+```
+</CodeGroup>
+
+## Get latest trade
+
+Retrieve the most recent trade across all coins:
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/trades/latest" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/trades/latest"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, headers=headers)
+latest_trade = response.json()
+```
+</CodeGroup>
+
+## Real-time monitoring example
+
+Implement a simple trade monitor that polls for new trades:
+
+```python Python
+import requests
+import time
+from datetime import datetime
+
+def monitor_trades(mint, interval_seconds=5):
+    """
+    Monitor trades for a coin in real-time using polling
+    """
+    url = f"https://frontend-api-v3.pump.fun/trades/all/{mint}"
+    headers = {
+        "Authorization": "Bearer <your_token>",
+        "Accept": "application/json"
+    }
+    
+    seen_trades = set()
+    
+    while True:
+        try:
+            params = {
+                "limit": 20,
+                "offset": 0,
+                "minimumSize": 0
+            }
+            
+            response = requests.get(url, headers=headers, params=params)
+            trades = response.json()
+            
+            for trade in trades:
+                trade_id = trade.get('signature')  # Unique identifier
+                if trade_id and trade_id not in seen_trades:
+                    seen_trades.add(trade_id)
+                    print(f"[{datetime.now()}] New trade: {trade}")
+            
+            time.sleep(interval_seconds)
+            
+        except Exception as e:
+            print(f"Error monitoring trades: {e}")
+            time.sleep(interval_seconds)
+
+# Usage
+mint = "CxLHsqvjfisgPAGwcZJsTn6nzZXJLxmVYM7v9pump"
+monitor_trades(mint, interval_seconds=10)
+```
+
+<Warning>
+Polling too frequently can lead to rate limiting. See the [best practices guide](/guides/best-practices) for recommended polling intervals.
+</Warning>
+
+## Best practices
+
+<Steps>
+  <Step title="Use appropriate page sizes">
+    Set `limit` between 20-100 for optimal performance. Larger values may cause timeouts.
+  </Step>
+  
+  <Step title="Filter by minimum size">
+    Use `minimumSize` to reduce data volume and focus on significant trades.
+  </Step>
+  
+  <Step title="Implement exponential backoff">
+    When polling, use exponential backoff on errors to avoid overwhelming the API.
+  </Step>
+  
+  <Step title="Cache trade data">
+    Store historical trades locally to minimize redundant API calls.
+  </Step>
+</Steps>

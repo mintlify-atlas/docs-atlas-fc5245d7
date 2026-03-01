@@ -1,0 +1,135 @@
+---
+title: 'Timeline'
+description: 'Retrieve user activity timeline and feed'
+icon: 'clock'
+---
+
+## Get User Timeline
+
+<ParamField path="method" type="string">
+  GET
+</ParamField>
+
+<ParamField path="endpoint" type="string">
+  /timeline/{userId}
+</ParamField>
+
+Retrieves the activity timeline for a specific user, including their posts, replies, and interactions.
+
+### Authentication
+
+Requires JWT authentication via `Authorization: Bearer <token>` header.
+
+### Path Parameters
+
+<ParamField path="userId" type="string" required>
+  The unique identifier of the user whose timeline to retrieve
+</ParamField>
+
+### Response
+
+<ResponseField name="200" type="object">
+  Success - Returns the user's timeline
+  <Expandable title="response">
+    <ResponseField name="activities" type="array">
+      Array of activity objects in chronological order
+      <Expandable title="activity">
+        <ResponseField name="id" type="string">
+          Unique identifier of the activity
+        </ResponseField>
+        <ResponseField name="type" type="string">
+          Type of activity (e.g., 'reply', 'like', 'follow', 'coin_creation')
+        </ResponseField>
+        <ResponseField name="timestamp" type="string">
+          When the activity occurred
+        </ResponseField>
+        <ResponseField name="user" type="object">
+          User who performed the activity
+        </ResponseField>
+        <ResponseField name="target" type="object">
+          The target of the activity (coin, reply, user, etc.)
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="nextCursor" type="string">
+      Cursor for pagination to load more activities
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/timeline/<userId>" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/timeline/<userId>"
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+fetch('https://frontend-api-v3.pump.fun/timeline/<userId>', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer <your_token>',
+    'Accept': 'application/json'
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data));
+```
+</CodeGroup>
+
+## Timeline Activities
+
+The timeline endpoint returns various types of activities:
+
+### Activity Types
+
+<ResponseField name="reply" type="activity">
+  User posted a reply or comment on a coin
+</ResponseField>
+
+<ResponseField name="like" type="activity">
+  User liked a coin or reply
+</ResponseField>
+
+<ResponseField name="follow" type="activity">
+  User followed another user
+</ResponseField>
+
+<ResponseField name="coin_creation" type="activity">
+  User created a new coin
+</ResponseField>
+
+<ResponseField name="trade" type="activity">
+  User bought or sold a coin
+</ResponseField>
+
+### Using the Timeline
+
+The timeline endpoint is useful for:
+
+- Displaying a user's recent activity feed
+- Building social features and user profiles
+- Tracking engagement metrics
+- Creating notification systems
+- Analyzing user behavior patterns
+
+<Note>
+  Timeline data is updated in near real-time. Activities typically appear within seconds of occurring.
+</Note>
+
+<Warning>
+  Timeline results may be paginated for users with high activity. Use the `nextCursor` field to load additional pages.
+</Warning>

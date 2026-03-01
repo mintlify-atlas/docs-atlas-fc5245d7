@@ -1,0 +1,249 @@
+---
+title: 'Get Coin'
+api: 'GET https://frontend-api-v3.pump.fun/coins/{mint}'
+description: 'Retrieve detailed information about a specific coin by its mint address'
+---
+
+## Endpoint
+
+```
+GET https://frontend-api-v3.pump.fun/coins/{mint}
+```
+
+## Authentication
+
+<Note>
+This endpoint requires JWT authentication. Include your token in the Authorization header.
+</Note>
+
+```bash
+Authorization: Bearer <your_token>
+```
+
+## Path Parameters
+
+<ParamField path="mint" type="string" required>
+  The Solana mint address of the coin you want to retrieve
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="sync" type="boolean" required>
+  Whether to synchronize the coin data with the latest blockchain state
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="object">
+  The coin object containing all relevant information
+  
+  <Expandable title="Coin Object Properties">
+    <ResponseField name="mint" type="string">
+      The Solana mint address of the coin
+    </ResponseField>
+    
+    <ResponseField name="name" type="string">
+      The name of the coin
+    </ResponseField>
+    
+    <ResponseField name="symbol" type="string">
+      The ticker symbol of the coin
+    </ResponseField>
+    
+    <ResponseField name="description" type="string">
+      Description of the coin
+    </ResponseField>
+    
+    <ResponseField name="image_uri" type="string">
+      URL to the coin's image
+    </ResponseField>
+    
+    <ResponseField name="metadata_uri" type="string">
+      URL to the coin's metadata JSON
+    </ResponseField>
+    
+    <ResponseField name="twitter" type="string">
+      Twitter handle associated with the coin
+    </ResponseField>
+    
+    <ResponseField name="telegram" type="string">
+      Telegram link associated with the coin
+    </ResponseField>
+    
+    <ResponseField name="bonding_curve" type="string">
+      Address of the bonding curve contract
+    </ResponseField>
+    
+    <ResponseField name="associated_bonding_curve" type="string">
+      Associated bonding curve token account
+    </ResponseField>
+    
+    <ResponseField name="creator" type="string">
+      Wallet address of the coin creator
+    </ResponseField>
+    
+    <ResponseField name="created_timestamp" type="number">
+      Unix timestamp of when the coin was created
+    </ResponseField>
+    
+    <ResponseField name="raydium_pool" type="string">
+      Raydium pool address (if graduated)
+    </ResponseField>
+    
+    <ResponseField name="complete" type="boolean">
+      Whether the coin has completed its bonding curve
+    </ResponseField>
+    
+    <ResponseField name="virtual_sol_reserves" type="number">
+      Virtual SOL reserves in the bonding curve
+    </ResponseField>
+    
+    <ResponseField name="virtual_token_reserves" type="number">
+      Virtual token reserves in the bonding curve
+    </ResponseField>
+    
+    <ResponseField name="total_supply" type="number">
+      Total supply of the coin
+    </ResponseField>
+    
+    <ResponseField name="website" type="string">
+      Website URL associated with the coin
+    </ResponseField>
+    
+    <ResponseField name="show_name" type="boolean">
+      Whether to display the creator's name
+    </ResponseField>
+    
+    <ResponseField name="king_of_the_hill_timestamp" type="number">
+      Timestamp when the coin was King of the Hill
+    </ResponseField>
+    
+    <ResponseField name="market_cap" type="number">
+      Current market capitalization in SOL
+    </ResponseField>
+    
+    <ResponseField name="reply_count" type="number">
+      Number of replies/comments on the coin
+    </ResponseField>
+    
+    <ResponseField name="last_reply" type="number">
+      Timestamp of the last reply
+    </ResponseField>
+    
+    <ResponseField name="nsfw" type="boolean">
+      Whether the coin is marked as NSFW
+    </ResponseField>
+    
+    <ResponseField name="market_id" type="string">
+      Market identifier
+    </ResponseField>
+    
+    <ResponseField name="inverted" type="boolean">
+      Whether the market is inverted
+    </ResponseField>
+    
+    <ResponseField name="username" type="string">
+      Username of the creator
+    </ResponseField>
+    
+    <ResponseField name="profile_image" type="string">
+      Profile image URL of the creator
+    </ResponseField>
+    
+    <ResponseField name="usd_market_cap" type="number">
+      Market cap in USD
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Code Examples
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://frontend-api-v3.pump.fun/coins/7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr?sync=true" \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Accept: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://frontend-api-v3.pump.fun/coins/7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr"
+params = {"sync": "true"}
+headers = {
+    "Authorization": "Bearer <your_token>",
+    "Accept": "application/json"
+}
+
+response = requests.get(url, params=params, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+const axios = require('axios');
+
+const url = 'https://frontend-api-v3.pump.fun/coins/7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr';
+const headers = {
+  'Authorization': 'Bearer <your_token>',
+  'Accept': 'application/json'
+};
+
+axios.get(url, { 
+  headers,
+  params: { sync: true }
+})
+  .then(response => console.log(response.data))
+  .catch(error => console.error(error));
+```
+
+</CodeGroup>
+
+## Response Example
+
+```json
+{
+  "mint": "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr",
+  "name": "Example Coin",
+  "symbol": "EXAMPLE",
+  "description": "An example coin on Pump.fun",
+  "image_uri": "https://cf-ipfs.com/ipfs/...",
+  "metadata_uri": "https://cf-ipfs.com/ipfs/...",
+  "twitter": "@example",
+  "telegram": "https://t.me/example",
+  "bonding_curve": "8mRW...",
+  "associated_bonding_curve": "9nXY...",
+  "creator": "CkqW...",
+  "created_timestamp": 1704067200000,
+  "raydium_pool": null,
+  "complete": false,
+  "virtual_sol_reserves": 30000000000,
+  "virtual_token_reserves": 1073000000000000,
+  "total_supply": 1000000000000000,
+  "website": "https://example.com",
+  "show_name": true,
+  "king_of_the_hill_timestamp": null,
+  "market_cap": 25.5,
+  "reply_count": 42,
+  "last_reply": 1704153600000,
+  "nsfw": false,
+  "market_id": null,
+  "inverted": false,
+  "username": "creator123",
+  "profile_image": "https://...",
+  "usd_market_cap": 2856.75
+}
+```
+
+## Notes
+
+- The `sync` parameter determines whether to fetch fresh data from the blockchain or use cached data
+- Setting `sync=true` may result in slower response times but ensures the most up-to-date information
+- Replace `<your_token>` with your actual JWT token
+- Replace the mint address in the examples with the actual coin mint you want to query
+
+## Related Endpoints
+
+- [List Coins](/api-reference/coins/list-coins) - Browse multiple coins
+- [Search Coins](/api-reference/coins/search) - Search for specific coins
+- [Get Metadata](/api-reference/coins/metadata) - Get coin metadata
